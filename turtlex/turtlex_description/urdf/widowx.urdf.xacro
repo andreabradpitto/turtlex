@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+   <xacro:property name="M_SCALE" value="0.001"/>
+   
+   <!--<xacro:include filename="$(find turtlex_description)/urdf/common_properties.urdf.xacro" />-->
+
+   <xacro:include filename="$(find turtlex_description)/urdf/widowx_gazebo.urdf.xacro"/>
+
+   <!--link name="plate_top_link"/-->
+   <!--joint name="fixed" type="fixed">
+      <parent link="plate_top_link" />
+      <child link="ph_base_link" />
+   </joint-->
+
+   <xacro:macro name="widowx_arm" params="parent *origin">
+      <!-- links -->
+      <link name="arm_base_link">
+         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/base_link.stl"/>
+            </geometry>
+            <xacro:material_black />
+	     </visual>
+         <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/base_link.stl"/>
+            </geometry>
+         </collision>
+         <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="0.379673" />
+            <inertia ixx="0.0004351000" iyy="0.0004452000" izz="0.0005731000" ixy="0.0000000707" ixz="0.0000000266" iyz="-0.0000022881" />
+         </inertial>
+      </link>
+      <link name="shoulder_link">
+         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/shoulder_link.stl" />
+            </geometry>
+            <xacro:material_black />
+         </visual>
+         <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/shoulder_link.stl"/>
+            </geometry>
+         </collision>
+         <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="0.072587" />
+            <inertia ixx="0.0000231000" iyy="0.0000253500" izz="0.0000144200" ixy="0.0000000003" ixz="0.0000001606" iyz="-0.0000000206" />
+         </inertial>
+      </link>
+      <link name="biceps_link">
+         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/biceps_link.new.stl" />
+            </geometry>
+            <xacro:material_black />
+         </visual>
+         <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/biceps_link.new.stl" />
+            </geometry>
+         </collision>
+         <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="0.082923" />
+            <inertia ixx="0.0000800600" iyy="0.0000745900" izz="0.0000368500" ixy="-0.0000002144" ixz="0.0000002982" iyz="0.0000165700" />
+         </inertial>
+      </link>
+      <link name="forearm_link">
+         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/forearm_link.new.stl"/>
+            </geometry>
+           <xacro:material_black />
+         </visual>
+         <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/forearm_link.new.stl"/>
+            </geometry>
+         </collision>
+         <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="0.073058" />
+            <inertia ixx="0.0000533800" iyy="0.0000165300" izz="0.0000603500" ixy="-0.0000003073" ixz="0.0000000000" iyz="0.0000000000" />
+         </inertial>
+      </link>
+      <link name="wrist_1_link">
+         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/wrist_1_link.stl"/>
+            </geometry>
+            <xacro:material_black />
+         </visual>
+         <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/wrist_1_link.stl"/>
+            </geometry>
+         </collision>
+         <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="0.069929" />
+            <inertia ixx="0.0000226800" iyy="0.0000204400" izz="0.0000197400" ixy="0.0000000000" ixz="0.0000000000" iyz="0.0000008485" />
+         </inertial>
+      </link>
+      <link name="wrist_2_link">
+         <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/wrist_2_link.new.stl"/>
+            </geometry>
+            <xacro:material_black />
+         </visual>
+         <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+               <mesh filename="package://turtlex_description/meshes/arm/wrist_2_link.new.stl"/>
+            </geometry>
+         </collision>
+         <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="0.069929" />
+            <inertia ixx="0.0000226800" iyy="0.0000204400" izz="0.0000197400" ixy="0.0000000000" ixz="0.0000000000" iyz="0.0000008485" />
+         </inertial>
+      </link>
+
+      <!-- joints -->
+      <joint name="arm_base_joint" type="fixed">
+         <xacro:insert_block name="origin" />
+         <parent link="${parent}" />
+         <child link="arm_base_link"/>
+      </joint>
+      <joint name="joint_1" type="revolute">
+         <origin xyz="0 0 ${M_SCALE*125}" rpy="0 0 0" />
+         <parent link="arm_base_link" />
+         <child link="shoulder_link" />
+         <axis xyz="0 0 1" />
+         <!--<limit lower="-2.617" upper="2.617" effort="6" velocity="0.785" />-->
+         <limit lower="-2.617" upper="2.617" effort="50" velocity="0.785" /> <!--era 10000-->
+         <dynamics friction="0.1"/>
+      </joint>
+      <joint name="joint_2" type="revolute">
+         <!--origin xyz="0.04825 0 0.14203" rpy="0 0 0" /-->
+         <origin xyz="0 0 0" rpy="0 0 0" />
+         <parent link="shoulder_link" />
+         <child link="biceps_link" />
+         <axis xyz="0 1 0" />
+         <!--<limit lower="-1.571" upper="1.571" effort="6" velocity="1.571" />-->
+         <limit lower="-1.571" upper="1.571" effort="50" velocity="1.571" /> <!--era 10000-->
+         <dynamics friction="0.1"/>
+      </joint>
+      <joint name="joint_3" type="revolute">
+         <origin xyz="${M_SCALE*48.25} 0 ${M_SCALE*142.03}" rpy="0 ${M_PI/2.0} 0" />
+         <parent link="biceps_link" />
+         <child link="forearm_link" />
+         <axis xyz="0 1 0" />
+         <!--<limit lower="-1.571" upper="1.571" effort="6" velocity="1.571" />-->
+         <limit lower="-1.571" upper="1.571" effort="50" velocity="1.571" /> <!--era 10000-->
+         <dynamics friction="0.1"/>
+      </joint>
+      <joint name="joint_4" type="revolute">
+         <origin xyz="0 0 ${M_SCALE*142.03}" rpy="0 0 0" />
+         <parent link="forearm_link" />
+         <child link="wrist_1_link" />
+         <axis xyz="0 1 0" />
+         <!--<limit lower="-1.745" upper="1.745" effort="6" velocity="1.571" />-->
+         <limit lower="-1.745" upper="1.745" effort="50" velocity="1.571" /> <!--era 10000-->
+         <dynamics friction="0.1"/>
+      </joint>
+      <joint name="joint_5" type="revolute">
+         <origin xyz="0 0 ${M_SCALE*71.5}" rpy="0 0 0" />
+         <parent link="wrist_1_link" />
+         <child link="wrist_2_link" />
+         <axis xyz="0 0 1" />
+         <!--<limit lower="-2.617" upper="2.617" effort="6" velocity="1.571" />-->
+         <limit lower="-2.617" upper="2.617" effort="50" velocity="1.571" /> <!--era 10000-->
+         <dynamics friction="0.1"/>
+      </joint>
+
+            <!-- Gripper -->
+            <!--<xacro:include filename="$(find turtlex_description)/urdf/widowx_gripper.xacro"/>-->
+            <link name="gripper_rail_link">
+            <visual>
+               <origin xyz="0 0 0" rpy="0 0 1.57" />
+               <geometry>
+                  <mesh filename="package://turtlex_description/meshes/arm/gripper_rail_link.stl"/>
+               </geometry>
+               <xacro:material_black />
+            </visual>
+            <collision>
+               <origin xyz="0 0 0" rpy="0 0 1.57" />
+               <geometry>
+                  <mesh filename="package://turtlex_description/meshes/arm/gripper_rail_link.stl"/>
+               </geometry>
+            </collision>
+            <inertial>
+               <origin xyz="0 0 0" rpy="0 0 0" />
+               <mass value="0.001" />
+               <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0" />
+            </inertial>
+         </link>
+         <link name="gripper_1_link">
+            <visual>
+               <origin xyz="0 -0.0007 0" rpy="0 0 1.57" />
+               <geometry>
+                  <mesh filename="package://turtlex_description/meshes/arm/gripper_hand_fixed_link.stl"/>
+               </geometry>
+               <xacro:material_black />
+            </visual>
+            <collision>
+               <origin xyz="0 -0.0007 0" rpy="0 0 1.57" />
+               <geometry>
+                  <mesh filename="package://turtlex_description/meshes/arm/gripper_hand_fixed_link.stl"/>
+               </geometry>
+            </collision>
+            <inertial>
+               <origin xyz="0 0 0" rpy="0 0 0" />
+               <mass value="0.016246" />
+               <inertia ixx="0.0000047310" iyy="0.0000015506" izz="0.0000037467" ixy="0.0000004560" ixz="0.0000000000" iyz="0.0000000000" />
+            </inertial>
+         </link>
+         <link name="gripper_2_link">
+            <visual>
+               <origin xyz="0 0.0007 0" rpy="0 0 -1.57" />
+               <geometry>
+                  <mesh filename="package://turtlex_description/meshes/arm/gripper_hand_fixed_link.stl"/>
+               </geometry>
+               <xacro:material_black />
+            </visual>
+            <collision>
+               <origin xyz="0 0.0007 0" rpy="0 0 -1.57" />
+               <geometry>
+                  <mesh filename="package://turtlex_description/meshes/arm/gripper_hand_fixed_link.stl"/>
+               </geometry>
+            </collision>
+            <inertial>
+               <origin xyz="0 0 0" rpy="0 0 0" />
+               <mass value="0.016246" />
+               <inertia ixx="0.0000047310" iyy="0.0000015506" izz="0.0000037467" ixy="0.0000004560" ixz="0.0000000000" iyz="0.0000000000" />
+            </inertial>
+         </link>
+         <joint name="joint_6" type="fixed">
+            <origin xyz = "0 0 ${M_SCALE*43}" rpy="0 0 0" />
+            <parent link="wrist_2_link" />
+            <child link="gripper_rail_link" />
+            <axis xyz="0 0 1" />
+         </joint>
+         <joint name="gripper_prismatic_joint_1" type="prismatic">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <parent link="gripper_rail_link" />
+            <child link="gripper_1_link" />
+            <axis xyz="0 -1 0" />
+            <!--<limit lower="0.002" upper="0.031" effort="6" velocity="0.5" />--> <!-- lower="0" upper="0.027"  ? -->
+            <limit lower="0.002" upper="0.031" effort="50" velocity="0.5" /> <!--era 10000-->
+            <dynamics friction="0.1"/>
+         </joint>
+         <joint name="gripper_prismatic_joint_2" type="prismatic">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <parent link="gripper_rail_link" />
+            <child link="gripper_2_link" />
+            <!--<mimic joint="gripper_prismatic_joint_1" multiplier="-1" offset="0"/>-->
+            <axis xyz="0 1 0" />
+            <!--<limit lower="0.002" upper="0.031" effort="6" velocity="0.5" />--> <!-- lower="0" upper="0.027"  ? -->
+            <limit lower="0.002" upper="0.031" effort="50" velocity="0.5" /> <!--era 10000-->
+            <dynamics friction="0.1"/>
+         </joint>
+
+         <!--<xacro:mimic_joint_plugin_gazebo name_prefix="gripper_prismatic_joint_2"
+         parent_joint="gripper_prismatic_joint_1" mimic_joint="gripper_prismatic_joint_2"
+         has_pid="true" multiplier="-1.0" max_effort="6" />-->
+
+   </xacro:macro>
+
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+ <transmission name="tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+   <joint name="joint_2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor2">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+ <transmission name="tran3">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_3">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor3">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+ <transmission name="tran4">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_4">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor4">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+ <transmission name="tran5">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_5">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor5">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+ <transmission name="tran6">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="gripper_prismatic_joint_1">
+    <!--<joint name="gripper_joint">-->
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor6">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran7">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="gripper_prismatic_joint_2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor7">
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+ <xacro:widowx_sim/>
+
+</robot>

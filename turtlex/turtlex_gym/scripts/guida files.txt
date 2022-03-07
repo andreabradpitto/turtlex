@@ -1,0 +1,16 @@
+algoritmi:
+qlearn.py
+
+main:
+start_qlearning.py		( -> turtlex_maze.py )
+my_start_qlearning_maze.py	( -> my_turtlex_maze.py )
+my_start_qlearning_wall.py	( -> my_turtlex_wall.py )
+
+task envs:
+turtlex_maze.py
+my_turtlex_maze.py
+my_turtlex_wall.py
+
+robot envs:
+turtlex_env.py
+

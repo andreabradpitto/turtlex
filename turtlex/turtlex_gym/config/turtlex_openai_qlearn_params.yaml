@@ -1,0 +1,45 @@
+turtlex: # namespace. If this is commented, uncomment the namespace in the main launch file
+    
+    #qlearn parameters
+    alpha: 1.0
+    gamma: 0.7
+    epsilon: 0.9
+    epsilon_discount: 0.999 # 1098 eps to reach 0.1
+    nepisodes: 500
+    nsteps: 500
+    #number_splits: 10 # set to change the number of state splits for the continuous problem and also the number of env_variable splits
+
+    #pos_step: 0.016     # increment in position for each command
+    running_step: 0.06 # Time for each step (amount of time the control will be executed)
+    #wait_time: 0.1 # Time to wait in the reset phases
+    #speed_step: 1.0 # Time to wait in the reset phases
+
+    n_actions: 3 # We have 3 actions, Forwards,TurnLeft,TurnRight
+    n_observations: 6 # We have 6 different observations
+
+    linear_forward_speed: 0.5 # Speed for going fowards
+    linear_turn_speed: 0.1 # Linear speed when turning
+    angular_speed: 0.3 # Angular speed when turning Left or Right
+    init_linear_forward_speed: 0.0 # Initial linear speed in which we start each episode
+    init_linear_turn_speed: 0.0 # Initial angular speed in shich we start each episode
+    
+    # Set of params used in the start_qlearning.py/turtlebot2_maze.py files (these are the same of the wall case ones)
+    # Notice that new_ranges is used by all but my_turtlebot2_maze.py: turlebot2_maze.py, my_turtlebot2_wall.py, turtlebot2_wall.py
+    # (the n_observations above is only used by turtlebot2_maze.py)
+    #new_ranges: 5 # How many laser readings we jump in each observation reading, the bigger the less laser resolution
+    #min_range: 0.5 # Minimum meters below wich we consider we have crashed
+    max_laser_value: 6 # Value considered Ok, no wall
+    min_laser_value: 0 # Value considered there is an obstacle or crashed
+    
+    # Set of params used in the my_start_qlearning_maze.py/my_turtlebot2_maze.py files
+    number_of_sectors: 3 # How many sectors we have
+    min_range: 0.5 # Minimum meters below wich we consider we have crashed
+    middle_range: 1.0 # Minimum meters below wich we consider we have crashed
+    danger_laser_value: 2 # Value considered Ok, no wall
+    middle_laser_value: 1 # Middle value
+    safe_laser_value: 0 # Value considered there is an obstacle or crashed
+    
+    forwards_reward: 5 # Points Given to go forwards
+    turn_reward: 1 # Points Given to turn as action
+    end_episode_points: 200 # Points given when ending an episode
+

@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: turtlex_description
+    relative_path: robots/turtlex_main.urdf.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/turtlex.srdf
+  CONFIG:
+    author_name: Andrea Pitto
+    author_email: s3942710@studenti.unige.it
+    generated_timestamp: 1642417905

@@ -1,0 +1,18 @@
+controller_list:
+  - name: arm_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: True
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+  - name: gripper_controller
+    action_ns: follow_joint_trajectory # action_ns: gripper_action
+    type: FollowJointTrajectory # type: GripperCommand
+    default: True
+    joints:
+      - gripper_prismatic_joint_1
+      - gripper_prismatic_joint_2

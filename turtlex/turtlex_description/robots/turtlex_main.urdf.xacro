@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+    - Base      : kobuki
+    - Stacks    : hexagons
+    - 3D sensor : asus xtion pro live
+    - Arm 		: widowx
+-->    
+<robot name="turtlex" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+	<!-- General -->
+	<xacro:include filename="$(find turtlex_description)/urdf/common_properties.urdf.xacro"/>
+	<!-- Bases -->
+	<xacro:include filename="$(find turtlex_description)/urdf/kobuki.urdf.xacro"/>
+	<!-- Stacks -->
+	<xacro:include filename="$(find turtlex_description)/urdf/hexagons.urdf.xacro"/>
+	<!-- 3D sensor -->
+	<xacro:include filename="$(find turtlex_description)/robots/rgbd.urdf.xacro"/>
+	<!-- Arm -->
+	<xacro:include filename="$(find turtlex_description)/robots/widowx_arm.urdf.xacro"/>
+
+	<xacro:kobuki/>
+	<xacro:stack_hexagons 			parent="base_link"/>
+	<xacro:rgbd_main				parent="base_link"/>
+	<xacro:widowx_arm_main 			parent="plate_bottom_link"/>
+
+</robot>

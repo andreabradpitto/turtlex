@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+    <arg name="robot" default="fetch"/>
+    <arg name="debug" default="false"/>
+    <arg name="gui" default="true"/>
+    <arg name="recording" default="false"/> <!-- previously called "headless" (now deprecated) -->
+    <arg name="pause" default="false"/>
+    <arg name="verbose" default="true"/>
+    <arg name="world_name" default="$(find fetch_gazebo)/worlds/empty_lightspot.world"/>
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="z" default="0.0"/>
+    <arg name="roll" default="0.0"/>
+    <arg name="pitch" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+
+    <!-- Start Gazebo with a blank world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg pause)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="recording" value="$(arg recording)"/>
+        <arg name="world_name" value="$(arg world_name)"/>
+    </include>
+    
+    <!-- Oh, you wanted a robot? -->
+    <include file="$(find fetch_gazebo)/launch/include/original_$(arg robot).launch.xml">
+        <arg name="x" value="$(arg x)" />
+        <arg name="y" value="$(arg y)" />
+        <arg name="z" value="$(arg z)" />
+        <arg name="yaw" value="$(arg yaw)" />
+    </include>
+
+    <!-- Launch MoveIt! -->
+    <include file="$(find test_moveit_config)/launch/move_group.launch"/>
+
+    <rosparam command="load" file="$(find temp)/config/fetch_n1try_params.yaml"/> <!-- working -->
+    <!--<rosparam command="load" file="$(find temp)/config/fetch_HER_params.yaml"/>-->
+    <!--<rosparam command="load" file="$(find temp)/config/fetch_HER_params.yaml"/>-->
+    <!--<rosparam command="load" file="$(find temp)/config/temp_config.yaml"/>-->
+    <!-- Launch the training system -->
+    <!--<node pkg="temp" name="fetch_n1try_algorithm" type="fetch_n1try.py" output="screen"/>--> <!-- working -->
+    <!--<node pkg="temp" name="fetch_moveit_test" type="test_fetch_norio.py" output="screen"/>-->
+    <!--<node pkg="temp" name="train_fetch_her" type="train.py" output="screen"/>-->
+    <!--<node pkg="temp" name="train_fetch_her" type="fetch_HER.py" output="screen"/>-->
+    <!--<node pkg="temp" name="temp_algorithm" type="temp_alg.py" output="screen"/>-->
+
+    <!-- Per farlo andare: in fetch_move_it_test.py, cambia da self.group = moveit_commander.MoveGroupCommander("widowx_arm") a
+         self.group = moveit_commander.MoveGroupCommander("arm")-->
+    <node pkg="temp" name="fetch_moveit_test" type="fetch_moveit_test.py" output="screen"/>
+    <!--<node pkg="openai_ros" name="fetch_test_task" type="fetch_test_task.py" output="screen"/>-->
+
+</launch>

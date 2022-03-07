@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+    <arg name="robot" default="turtlex"/>
+    <arg name="debug" default="false"/>
+    <arg name="gui" default="true"/>
+    <arg name="recording" default="false"/> <!-- previously called "headless" (now deprecated) -->
+    <arg name="pause" default="false"/>
+    <arg name="verbose" default="true"/>
+    <!--<arg name="world_name" default="$(find fetch_gazebo)/worlds/empty_lightspot.world"/>-->
+    <arg name="world_name" default="$(find turtlex_gazebo)/worlds/office_vuoto.sdf"/>
+
+    <arg name="x"                 value="0.0"/>
+    <arg name="y"                 value="0.0"/>
+    <arg name="z"                 value="0.0"/>
+    <arg name="roll"              value="0.0"/>
+    <arg name="pitch"             value="0.0"/>
+    <arg name="yaw"               value="0.0"/>
+    <arg name="joint_1"           value="0.0"/>
+    <arg name="joint_2"           value="-1.0"/>
+    <arg name="joint_3"           value="1.0"/>
+    <arg name="joint_4"           value="1.2"/>
+    <arg name="joint_5"           value="0.0"/>
+    <arg name="gripper_joint_1"   value="0.003"/>
+    <arg name="gripper_joint_2"   value="0.003"/>
+
+    <!-- Start Gazebo with a blank world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg pause)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="recording" value="$(arg recording)"/>
+        <!--<arg name="world_name" value="$(arg world_name)"/>-->
+    </include>
+
+
+
+    <!-- include robot -->
+    <arg name="urdf_file" default="$(find xacro)/xacro '$(find turtlex_description)/robots/turtlex_main.urdf.xacro'" />
+    <param name="robot_description" command="$(arg urdf_file)"/>
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <rosparam file="$(find turtlex_description)/config/widowx.yaml" command="load"/>
+    <!-- load the controllers -->           <!-- QUI HO TOLTO ns="/turtlex" -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+            output="screen" args="joint1_position_controller joint2_position_controller joint3_position_controller
+                                joint4_position_controller joint5_position_controller
+                                gripper_joint1_position_controller gripper_joint2_position_controller joint_state_controller"/>
+
+    <!-- Gazebo model spawner -->           <!-- QUI HO TOLTO -unpause negli args, davanti a -urdf -->
+    <node name="spawn_turtlex_model" pkg="gazebo_ros" type="spawn_model"
+            args="$(optenv ROBOT_INITIAL_POSE) -urdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)
+                -J joint_1 $(arg joint_1) -J joint_2 $(arg joint_2) -J joint_3 $(arg joint_3)
+                -J joint_4 $(arg joint_4) -J joint_5 $(arg joint_5) -J gripper_prismatic_joint_1 $(arg gripper_joint_1)
+                -J gripper_prismatic_joint_2 $(arg gripper_joint_2) -param robot_description -model mobile_base"/> <!--Questo mobile base alla fine?!-->
+
+    <!-- Velocity muxer -->
+    <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/> <!-- Serve ? -->
+
+    <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>--> <!-- Se lancio la sim in Gazebo questo va in conflitto su /joint_states -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+        <param name="publish_frequency" type="double" value="30.0"/> <!-- prova anche value="5.0" -->
+    </node>
+
+
+
+    <!-- Launch MoveIt! -->
+    <include file="$(find temp_moveit_config)/launch/move_group.launch"/>
+
+    <!--<rosparam command="load" file="$(find temp)/config/fetch_n1try_params.yaml"/>--> <!-- working -->
+    <!--<rosparam command="load" file="$(find temp)/config/fetch_HER_params.yaml"/>-->
+    <!--<rosparam command="load" file="$(find temp)/config/fetch_HER_params.yaml"/>-->
+    <!--<rosparam command="load" file="$(find temp)/config/temp_config.yaml"/>-->
+    <!-- Launch the training system -->
+    <!--<node pkg="temp" name="fetch_n1try_algorithm" type="fetch_n1try.py" output="screen"/>--> <!-- working -->
+    <!--<node pkg="temp" name="fetch_moveit_test" type="test_fetch_norio.py" output="screen"/>-->
+    <!--<node pkg="temp" name="train_fetch_her" type="train.py" output="screen"/>-->
+    <!--<node pkg="temp" name="train_fetch_her" type="fetch_HER.py" output="screen"/>-->
+    <!--<node pkg="temp" name="temp_algorithm" type="temp_alg.py" output="screen"/>--> <!-- copia di fetch_n1try.py, per ora -->
+
+    <!--<node pkg="temp" name="fetch_moveit_test" type="fetch_moveit_test.py" output="screen"/>--> <!-- working -->
+
+</launch>

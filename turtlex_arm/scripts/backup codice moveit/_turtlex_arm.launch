@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+<!--crasi tra turtlex_arm_moveit.launch e turtlex_planning_execution.launch (nella cartella turtlex_moveit_config) -->
+
+    <arg name="robot" default="turtlex"/>
+    <arg name="debug" default="false"/>
+    <arg name="gui" default="true"/>
+    <arg name="recording" default="false"/> <!-- previously called "headless" (now deprecated) -->
+    <arg name="paused" default="true"/>
+    <arg name="verbose" default="false"/>
+    <!--<arg name="world_name" value="worlds/empty.world"/>-->
+    <arg name="world_name" value="$(find turtlex_gazebo)/worlds/my_office_grip_test.world"/>
+    <arg name="moveit_controller_manager" default="ros_control"/> <!-- TODO "simple" / "ros_control" / "andrea" --> <!-- poi da mettere sotto insieme a load_robot_description-->
+
+    <arg name="use_rviz" default="true"/>
+    <arg name="rviz_config" value="$(find turtlex_moveit_config)/launch/moveit.rviz"/>
+
+    <!-- Start Gazebo with a blank world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="recording" value="$(arg recording)"/>
+        <arg name="world_name" default="$(arg world_name)"/>
+    </include>
+
+    <rosparam command="load" file="$(find turtlex_moveit_config)/config/joint_names.yaml"/>
+
+    <!--<arg name="initial_robot_position" doc="Initial robot position of the robot"
+         default=" -x 0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>-->
+    <arg unless="$(arg use_rviz)" name="initial_robot_position" doc="Initial robot position of the robot" default=" -x 0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
+    <arg     if="$(arg use_rviz)" name="initial_robot_position" doc="Initial robot position of the robot" default=" -x 0 -y 0.0 -z 0.01 -R 0.0 -P 0.0 -Y 0.0"/>
+    <arg name="initial_joint_positions" doc="Initial joint configuration of the robot"
+         default=" -J gripper_prismatic_joint_1 0.0104 -J gripper_prismatic_joint_2 0.0104 -J joint_1 0 -J joint_2 -1 -J joint_3 1 -J joint_4 1.2 -J joint_5 0"/>
+    <arg name="world_pose" value="-x 0 -y 0 -z 0"/>
+
+    <!-- include robot -->
+    <arg name="urdf_file" default="$(find xacro)/xacro '$(find turtlex_description)/robots/turtlex_main.urdf.xacro'" />
+    <param name="robot_description" command="$(arg urdf_file)"/>
+
+    <!--<rosparam file="$(find fetch_gazebo)/config/default_controllers.yaml" command="load" />--> <!-- controller creato per mimare fetch. Da usare con andrea_moveit_controller, ma mi sa che non va niente perche ci vuole un plugin analogo a quello in fetch.gazebo.xacro-->
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <!--<rosparam file="$(find turtlex_description)/config/widowx.yaml" command="load"/>-->
+    <!-- load the controllers -->
+    <!--<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+            output="screen" args="joint_state_controller joint_1_position_controller joint_2_position_controller
+                                  joint_3_position_controller joint_4_position_controller joint_5_position_controller
+                                  gripper_prismatic_joint_1_position_controller gripper_prismatic_joint_2_position_controller"/>-->
+
+    <!-- joint_state_controller is the one providing the /joint_states topic -->
+
+    <!-- Load joint controller parameters for Gazebo -->
+    <rosparam file="$(find turtlex_moveit_config)/config/gazebo_controllers.yaml"/>
+    <!-- Load the controllers -->
+    <rosparam file="$(find turtlex_moveit_config)/config/ros_controllers.yaml" />
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller arm_controller gripper_controller"/>
+
+    <!-- Gazebo model spawner -->
+    <arg name="unpause" value="$(eval '-unpause' if arg('paused') else '')"/>
+    <!--<arg name="unpause" value=""/>-->
+    <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+          args="$(optenv ROBOT_INITIAL_POSE) -urdf -param robot_description $(arg unpause) -model $(arg robot) $(arg world_pose) $(arg initial_robot_position) $(arg initial_joint_positions)"/>
+
+    <!--<node name="prepare_robot" pkg="turtlex_moveit_config" type="prepare_simulated_robot.py" />-->
+
+    <!-- Velocity muxer -->
+    <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/> <!-- Serve ? -->
+
+    <!-- If needed, broadcast static tf for robot root -->
+    <!--<node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 odom base_footprint" />--> <!-- Questo se non ho virtual joint non credo serva -->
+    <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <rosparam param="/source_list">[/joint_states]</rosparam>
+    </node>--> <!-- Questo commentato perche mi dava TF redundant data: anche senza il braccio prende ugualmente le posizioni e ci va -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
+
+    <!-- Launch MoveIt -->
+    <include file="$(find turtlex_moveit_config)/launch/move_group.launch">
+        <arg name="publish_monitored_planning_scene" value="true"/>
+        <arg name="info" value="true"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="load_robot_description" value="true" /> <!-- TODO da provare anche "false" -->
+        <arg name="moveit_controller_manager" value="$(arg moveit_controller_manager)"/>
+    </include>
+
+    <!-- Run RViz and load the default config to see the state of the move_group node -->
+    <group if="$(arg use_rviz)">
+        <!--<arg name="debug" default="false" />-->
+        <arg unless="$(arg debug)" name="launch_prefix" value="" />
+        <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
+
+        <!--<arg name="rviz_config" default="" />-->
+        <arg     if="$(eval rviz_config=='')" name="command_args" value="" />
+        <arg unless="$(eval rviz_config=='')" name="command_args" value="-d $(arg rviz_config)" />
+
+        <node name="$(anon rviz)" launch-prefix="$(arg launch_prefix)" pkg="rviz" type="rviz" respawn="false"
+                args="$(arg command_args)" output="screen">
+        </node>
+    </group>
+
+
+    <!--<rosparam command="load" file="$(find temp)/config/fetch_n1try_params.yaml"/>--> <!-- working -->
+    <!--<rosparam command="load" file="$(find temp)/config/fetch_HER_params.yaml"/>-->
+    <!--<rosparam command="load" file="$(find temp)/config/fetch_HER_params.yaml"/>-->
+    <rosparam command="load" file="$(find turtlex_arm)/config/turtlex_arm_config.yaml"/>
+    <!-- Launch the training system -->
+    <!--<node pkg="turtlex_arm" name="turtlex_arm_algorithm" type="turtlex_arm_alg.py" output="screen"/>--> <!-- working -->
+    <!--<node pkg="temp" name="fetch_moveit_test" type="test_fetch_norio.py" output="screen"/>-->
+    <!--<node pkg="temp" name="train_fetch_her" type="train.py" output="screen"/>-->
+    <!--<node pkg="temp" name="train_fetch_her" type="fetch_HER.py" output="screen"/>-->
+    <!--<node pkg="temp" name="temp_algorithm" type="temp_alg.py" output="screen"/>--> <!-- copia di fetch_n1try.py, per ora -->
+
+    <!--<node pkg="turtlex_arm" name="turtlex_arm_moveit_test" type="turtlex_arm_moveit_test.py" output="screen"/>-->
+
+</launch>
