@@ -10,11 +10,7 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 
 - [src](src): folder containing the source code of the assignment
 
-- [config](config): file storing all the cofiguration settings for the assignment. The header [def.h](src/def.h) contains, among other comments, also the default values for all the elements
-
-- [makefile](makefile): file used to automatically build or delete executables and log files. See [Make](https://en.wikipedia.org/wiki/Make_(software)) for further information
-
-- [.gitignore](.gitignore): hidden file that specifies which files and folder are not relevant for [Git](https://git-scm.com/)
+- [.gitignore](.gitignore): hidden file that specifies which files and folders are not relevant for [Git](https://git-scm.com/)
 
 - [LICENSE](LICENSE): a plain text file containing the license terms
 
@@ -25,8 +21,6 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 - A [**POSIX**](https://en.wikipedia.org/wiki/POSIX)-compliant machine
 - [GCC](https://gcc.gnu.org/) compiler collection
 - At least 1 MB of free disk space
-
-The space required is intended for the repository contents + the compiled code. Please beware that running the code for an extended time span may produce much greater log file sizes (~ 7 MB per minute with the default [parameters](https://github.com/andreabradpitto/ARP-assignment#configuration-file)).
 
 ## ✅ Installation
 
