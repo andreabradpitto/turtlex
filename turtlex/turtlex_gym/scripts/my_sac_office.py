@@ -259,8 +259,8 @@ class SAC(object):
     
     # Save model parameters
     def save_models(self, episode_count, world_name):
-        torch.save(self.policy.state_dict(), dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + '_policy_net.pth')
-        torch.save(self.critic.state_dict(), dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + '_value_net.pth')
+        torch.save(self.policy, dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + '_policy_net.pth')
+        torch.save(self.critic, dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + '_value_net.pth')
         # hard_update(self.critic_target, self.critic)
         # torch.save(soft_q_net.state_dict(), dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + 'soft_q_net.pth')
         # torch.save(target_value_net.state_dict(), dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + 'target_value_net.pth')
@@ -274,8 +274,8 @@ class SAC(object):
     
     # Load model parameters
     def load_models(self, episode, world_name):
-        self.policy.load_state_dict(torch.load(dirPath + '/nav_sac/' + world_name + '/' + str(episode) + '_policy_net.pth', map_location=self.device))
-        self.critic.load_state_dict(torch.load(dirPath + '/nav_sac/' + world_name + '/' + str(episode) + '_value_net.pth', map_location=self.device))
+        self.policy = torch.load(dirPath + '/nav_sac/' + world_name + '/' + str(episode) + '_policy_net.pth', map_location=self.device)
+        self.critic = torch.load(dirPath + '/nav_sac/' + world_name + '/' + str(episode) + '_value_net.pth', map_location=self.device)
         hard_update(self.critic_target, self.critic)
         # soft_q_net.load_state_dict(torch.load(dirPath + '/nav_sac/' + world_name + '/'+str(episode) + 'soft_q_net.pth'))
         # target_value_net.load_state_dict(torch.load(dirPath + '/nav_sac/' + world_name + '/'+str(episode) + 'target_value_net.pth'))
