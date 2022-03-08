@@ -1,0 +1,19 @@
+<package>
+  <name>turtlex_bt</name>
+  <version>2.3.11</version>
+  <description>
+  This package implements the behavior tree for the Turtlex robot
+  </description>
+  <author email="s3942710@studenti.unige.it">Andrea Pitto</author>
+  <maintainer email="s3942710@studenti.unige.it">Andrea Pitto</maintainer>
+
+  <license>BSD</license>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>task_behavior_ros</build_depend>
+  <build_depend>rospy</build_depend>
+
+  <run_depend>task_behavior_ros</run_depend>
+  <run_depend>rospy</run_depend>
+</package>
