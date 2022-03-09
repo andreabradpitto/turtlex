@@ -4,11 +4,9 @@ from gym import spaces
 import turtlex_env
 from gym.envs.registration import register
 from geometry_msgs.msg import Point
-
 import random
 import math
 from tf.transformations import euler_from_quaternion
-from collections import deque
 from utils import tcolors
 
 
@@ -29,7 +27,7 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
 
         super(MyTurtlexOfficeEnv, self).__init__()
 
-        # We set the reward range, which is not compulsory
+        # We set the reward range, even if it is not compulsory
         self.reward_range = (-np.inf, np.inf)
 
         action_low = np.array([self.action_v_min, self.action_w_min])
@@ -39,17 +37,8 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         laser_scan = self._check_laser_scan_ready()
         self.max_laser_value = laser_scan.range_max # Hokuyo sensor's range_max = 30.0
         self.min_laser_value = laser_scan.range_min # Hokuyo sensor's range_min = 0.10000000149011612
-        #obs_high = np.full((self.new_ranges), self.max_laser_value)
-        #obs_low = np.full((self.new_ranges), self.min_laser_value)
         obs_high = np.full((self.n_sectors), self.max_laser_value)
         obs_low = np.full((self.n_sectors), self.min_laser_value)
-
-        #goal_x_max = max(self.goal_x_list)
-        #goal_x_min = min(self.goal_x_list)
-        #goal_y_max = max(self.goal_y_list)
-        #goal_y_min = min(self.goal_y_list)
-        #obs_high = np.concatenate((obs_high, [self.world_x_max, self.world_y_max, goal_x_max, goal_y_max]))
-        #obs_low = np.concatenate((obs_low, [self.world_x_min, self.world_x_min, goal_x_min, goal_y_min]))
 
         self.desired_point = Point()
 
@@ -59,34 +48,21 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         min_point = Point()
         min_point.x = self.world_x_min
         min_point.y = self.world_y_min
-        max_distance = self.get_distance_from_point(max_point, min_point) # TODO questo non e detto sia proprio la max distance. Va bene per il box?
+        max_distance = self.get_distance_from_point(max_point, min_point)
         obs_high = np.concatenate((obs_high, action_high, [math.pi, max_distance]))
         obs_low = np.concatenate((obs_low, action_low, [-math.pi, 0.0]))
 
         self.observation_space = spaces.Box(np.float32(obs_low), np.float32(obs_high))
 
-        """
-        self.observation_space = spaces.Dict(dict(
-            laser_readings=spaces.Box(self.min_laser_value, self.max_laser_value, shape=obs['laser_readings'].shape, dtype='float32'),
-            past_action=spaces.Box(action_low, action_high, shape=obs['past_action'].shape, dtype='float32'),
-            heading=spaces.Box(-math.pi, math.pi, shape=obs['heading'].shape, dtype='float32'),
-            goal_dist=spaces.Box(0.0, max_distance, shape=obs['goal_dist'].shape, dtype='float32')))
-        """
-
-        #self.last_goal_idx = -1
-        #self.goal_idx = -1
         self.goal_to_solve_idx = 0
 
-        self.overall_reward = 0 # sum of the rewards of all the previous and current episodes
-        self.overall_steps = 0 # sum of the steps of all the previous and current episodes
+        self.overall_reward = 0  # sum of the rewards of all the previous and current episodes
+        self.overall_steps = 0  # sum of the steps of all the previous and current episodes
 
         self.consecutive_goals = 0
         self.consecutive_goal_threshold = 10
-        #self.score_hist_length = 30
-        #self.score_history = deque(maxlen=self.score_hist_length)
 
         if not(self.is_training):
-        #if (True):
             self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.testing_goals)
             self.solved_counter = 0
 
@@ -101,39 +77,24 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         self.is_training = rospy.get_param("/turtlex/training")
         self.testing_goals = rospy.get_param("/turtlex/testing_goals")
 
-        #number_actions = rospy.get_param('/turtlex/n_actions')
-        #self.action_space = spaces.Discrete(number_actions)
         self.action_v_min = rospy.get_param("/turtlex/action_v_min")
         self.action_w_min = rospy.get_param("/turtlex/action_w_min")
         self.action_v_max = rospy.get_param("/turtlex/action_v_max")
         self.action_w_max = rospy.get_param("/turtlex/action_w_max")
 
         # Actions and Observations
-        #self.linear_forward_speed = rospy.get_param('/turtlex/linear_forward_speed')
-        #self.linear_turn_speed = rospy.get_param('/turtlex/linear_turn_speed')
-        #self.angular_speed = rospy.get_param('/turtlex/angular_speed')
         self.init_linear_forward_speed = rospy.get_param('/turtlex/init_linear_forward_speed')
         self.init_linear_turn_speed = rospy.get_param('/turtlex/init_linear_turn_speed')
 
-        #self.new_ranges = rospy.get_param('/turtlex/new_ranges')
         self.min_range = rospy.get_param('/turtlex/min_range')
-        #self.max_laser_value = rospy.get_param('/turtlex/max_laser_value')
-        #self.min_laser_value = rospy.get_param('/turtlex/min_laser_value')
 
-        self.world_x_max = rospy.get_param("/turtlex/world_bounds/x_max") # self.world_bounds = rospy.get_param("/turtlex/world_bounds")
+        self.world_x_max = rospy.get_param("/turtlex/world_bounds/x_max")
         self.world_x_min = rospy.get_param("/turtlex/world_bounds/x_min")
         self.world_y_max = rospy.get_param("/turtlex/world_bounds/y_max")
         self.world_y_min = rospy.get_param("/turtlex/world_bounds/y_min")
 
-        # Get the desired point to reach
-        #self.desired_point = Point()
-        #self.desired_point.x = rospy.get_param("/turtlex/desired_pose/x")
-        #self.desired_point.y = rospy.get_param("/turtlex/desired_pose/y")
-        #self.desired_point.z = rospy.get_param("/turtlex/desired_pose/z")
-
-        self.goal_x_list = rospy.get_param("/turtlex/desired_pose/x") # self.goal_list = rospy.get_param("/turtlex/desired_pose")
+        self.goal_x_list = rospy.get_param("/turtlex/desired_pose/x")
         self.goal_y_list = rospy.get_param("/turtlex/desired_pose/y")
-        #self.goal_yaw_list = rospy.get_param("/turtlex/desired_pose/Y") # yaw
 
         self.n_sectors = rospy.get_param("/turtlex/n_sectors")
 
@@ -141,8 +102,6 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         self.max_idle_steps = rospy.get_param("/turtlex/max_idle_steps")
 
         # Rewards
-        #self.forwards_reward = rospy.get_param("/turtlex/forwards_reward")
-        #self.turn_reward = rospy.get_param("/turtlex/turn_reward")
         self.end_episode_points = rospy.get_param("/turtlex/end_episode_points")
         self.decrease_dist_reward = rospy.get_param("/turtlex/decrease_goal_distance")
         self.increase_dist_reward = rospy.get_param("/turtlex/increase_goal_distance")
@@ -210,29 +169,13 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         # Set Done to false, because it is calculated asyncronously
         self.episode_done = False
         self.step_counter = 0
-        self.episode_reward = 0 # this has the same function of env.cumulated_episode_reward, but I may need a copy here that gets "updated faster"
-        #self.still_robot_counter = 0
+        self.episode_reward = 0  # this has the same function of env.cumulated_episode_reward, but I may need a copy here that gets "updated faster"
 
-        #while(self.goal_idx == self.last_goal_idx):
-        #    self.goal_idx = random.randrange(0, len(self.goal_x_list))
-        #while(self.goal_idx == self.last_goal_idx):
-        #    if self.goal_idx != (len(self.goal_x_list) - 1):
-        #        self.goal_idx += 1
-        #    else:
-        #        self.goal_idx = 0
-
-        #self.desired_point.x = self.goal_x_list[self.goal_idx]
-        #self.desired_point.y = self.goal_y_list[self.goal_idx]
         self.desired_point.x = self.goal_x_list[self.goal_to_solve_idx]
         self.desired_point.y = self.goal_y_list[self.goal_to_solve_idx]
-        #self.desired_point.z = 0
-        #self.desired_heading = self.goal_yaw_list[self.goal_idx]
 
-        #rospy.logdebug(f"New goal index: {self.goal_idx} | last goal index: {self.last_goal_idx}")
         rospy.logdebug("desired_point.x: " + str(self.desired_point.x))
         rospy.logdebug("desired_point.y: " + str(self.desired_point.y))
-
-        #self.last_goal_idx = self.goal_idx
 
         self.odometry = self.get_odom()
         self.previous_distance_from_des_point = self.get_distance_from_point(self.odometry.pose.pose.position, self.desired_point)
@@ -242,7 +185,7 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         self.previous_action = np.array([0.,0.])
         self.current_action = np.array([0.,0.])
 
-    def _set_action(self, action): # I switched from a pool of discrete actions to a continuous action space
+    def _set_action(self, action):  # continuous action space
         """
         This set action will Set the linear and angular speed of the turtlex
         based on the action number given.
@@ -255,22 +198,6 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
 
         linear_speed = action[0]
         angular_speed = action[1]
-
-        """
-        # We convert the actions to speed movements to send to the parent class TurtlexEnv
-        if action == 0: #FORWARDS
-            linear_speed = self.linear_forward_speed
-            angular_speed = 0.0
-            self.last_action = "FORWARDS"
-        elif action == 1: #LEFT
-            linear_speed = self.linear_turn_speed
-            angular_speed = self.angular_speed
-            self.last_action = "TURN_LEFT"
-        elif action == 2: #RIGHT
-            linear_speed = self.linear_turn_speed
-            angular_speed = -1 * self.angular_speed
-            self.last_action = "TURN_RIGHT"
-        """
         
         self.current_action = action
 
@@ -293,15 +220,6 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         
         # We get the odometry so that Turtlex knows where it is
         self.odometry = self.get_odom()
-        #x_position = odometry.pose.pose.position.x
-        #y_position = odometry.pose.pose.position.y
-
-        # We round to only two decimals to avoid very big Observation space
-        #odometry_array = [round(x_position, self.round_value),round(y_position, self.round_value)]
-
-        #goal_array = [self.desired_point.x, self.desired_point.y]
-
-        #observations = discretized_laser_scan + odometry_array + goal_array
 
         heading = self.compute_heading_to_point(self.odometry, self.desired_point)
         goal_distance = self.get_distance_from_point(self.odometry.pose.pose.position, self.desired_point)
@@ -326,45 +244,15 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
             rospy.loginfo(tcolors.MAGENTA + "Turtlex is too close to an obstacle, episode ended ==>" + tcolors.ENDC)
         else:
             rospy.loginfo(tcolors.MAGENTA + "Turtlex has not crashed this step ==>" + tcolors.ENDC)
-       
-            #current_position = Point()
-            #current_position.x = observations[-4] # cambiato perche ho cambiato l'obs/state array! (1/2)
-            #current_position.y = observations[-3]
-            #current_position.z = 0.0
 
-            # We check if it got to the desired point # Questo sostiuisce tutto quello sotto
+            # We check if it got to the desired point
             if self.is_in_desired_position(self.odometry.pose.pose.position):
-            #if self.is_in_desired_position(current_position):
                 self.episode_done = True
-
-            
-            """
-            # We check if we are outside the Learning Space
-            if current_position.x <= self.world_x_max and current_position.x > self.world_x_min:
-                if current_position.y <= self.world_y_max and current_position.y > self.world_y_min:
-                    rospy.logdebug("Turtlex Position is OK ==> [" + str(current_position.x) + "," + str(current_position.y) + "]")
-                    
-                    # We check if it got to the desired point
-                    if self.is_in_desired_position(current_position):
-                        self.episode_done = True
-                    
-                else:
-                    rospy.loginfo(tcolors.MAGENTA + "Turtlex too Far in Y Pos ==> " + str(current_position.x) + tcolors.ENDC)
-                    self.episode_done = True
-            else:
-                rospy.loginfo(tcolors.MAGENTA + "Turtlex too Far in X Pos ==> " + str(current_position.x) + tcolors.ENDC)
-                self.episode_done = True
-            """
 
         return self.episode_done
 
 
     def _compute_reward(self, observations, done):
-
-        #current_position = Point()
-        #current_position.x = observations[-4] # cambiato perche ho cambiato l'obs/state array! (2/2)
-        #current_position.y = observations[-3]
-        #current_position.z = 0.0
 
         goal_distance_difference =  observations[-1] - self.previous_distance_from_des_point # observations[-1] contains the current distance
         self.previous_distance_from_des_point = observations[-1]
@@ -374,37 +262,20 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
             # If there has been a decrease in the distance from the desired point, we reward it
             if goal_distance_difference < 0.0:
                 reward = self.decrease_dist_reward
-                #self.still_robot_counter = 0
-                #rospy.loginfo(tcolors.CYAN + f"Decreased distance from goal {self.desired_point.x, self.desired_point.y} | reward: {reward}" + tcolors.ENDC)
                 rospy.loginfo(tcolors.CYAN + f"Action's outcome: decreased distance from goal {self.desired_point.x, self.desired_point.y}" +
                                              f" | {self.goal_to_solve_idx + 1}/{len(self.goal_x_list)}" + tcolors.ENDC)
             elif goal_distance_difference > 0.0:
                 reward = self.increase_dist_reward
-                #self.still_robot_counter = 0
-                #rospy.loginfo(tcolors.CYAN + f"Increased distance from goal {self.desired_point.x, self.desired_point.y} | reward: {reward}" + tcolors.ENDC)
                 rospy.loginfo(tcolors.CYAN + f"Action's outcome: increased distance from goal {self.desired_point.x, self.desired_point.y}" +
                                              f" | {self.goal_to_solve_idx + 1}/{len(self.goal_x_list)}" + tcolors.ENDC)
             else:
                 reward = self.increase_dist_reward
-                #self.still_robot_counter += 1
-                #if self.still_robot_counter < self.max_idle_steps:
-                    #reward = 0
-                    #reward = self.increase_dist_reward
-                    #rospy.loginfo(tcolors.CYAN + f"Distance from goal unchanged {self.desired_point.x, self.desired_point.y} | reward: {reward}" + tcolors.ENDC)
-                #else:
-                    #reward = self.increase_dist_reward * self.still_robot_counter
-                    #rospy.loginfo(tcolors.CYAN + f"Distance from goal unchanged {self.desired_point.x, self.desired_point.y} | reward: {reward}" + tcolors.ENDC)
                 rospy.loginfo(tcolors.CYAN + f"Action's outcome: distance from goal unchanged {self.desired_point.x, self.desired_point.y}" +
                                              f" | {self.goal_to_solve_idx + 1}/{len(self.goal_x_list)}" + tcolors.ENDC)
-
-            #self.episode_reward += reward
 
             if self.step_counter == self.max_steps:
                 if self.is_training:
                     self.consecutive_goals = 0
-                    #reward = 0
-                    #self.score_history.append(reward)
-                    #self.score_history.append(self.episode_reward)
                 else:
                     self.goal_to_solve_idx += 1
                     if self.goal_to_solve_idx == len(self.goal_x_list):
@@ -412,22 +283,14 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
 
         else:
             if self.is_in_desired_position(self.odometry.pose.pose.position):
-            #if self.is_in_desired_position(current_position):
-                #rospy.loginfo(tcolors.CYAN + f"The robot has reached the goal {self.desired_point.x, self.desired_point.y) | reward: {self.end_episode_points}" + tcolors.ENDC)
                 rospy.loginfo(tcolors.CYAN + f"Action's outcome: the robot has reached the goal {self.desired_point.x, self.desired_point.y}" + tcolors.ENDC)
                 reward = self.end_episode_points
-                #self.episode_reward += self.end_episode_points
 
                 if self.is_training:
                     self.consecutive_goals += 1
                     if (self.consecutive_goals == self.consecutive_goal_threshold):
                         self.consecutive_goals = 0
                         self.goal_to_solve_idx += 1
-                    #self.score_history.append(self.episode_reward)
-                    #if (self.queue_avg(self.score_history) >= .9 * self.end_episode_points) and len(self.score_history) == self.score_hist_length:
-                        #self.deque_over_value = self.queue_avg(self.score_history) # save the final average
-                        #self.score_history.clear()
-                        #self.goal_to_solve_idx += 1
                         if self.goal_to_solve_idx == len(self.goal_x_list):
                             self.goal_to_solve_idx = 0
                 else:
@@ -436,14 +299,11 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
                     if self.goal_to_solve_idx == len(self.goal_x_list):
                         self.goal_to_solve_idx = 0
             else:
-                #rospy.loginfo(tcolors.CYAN + f"The robot got too close to an obstacle | reward: {-1 * self.end_episode_points}" + tcolors.ENDC)
                 rospy.loginfo(tcolors.CYAN + f"Action's outcome: the robot got too close to an obstacle" + tcolors.ENDC)
                 reward = -1 * self.end_episode_points
-                #self.episode_reward += -1 * self.end_episode_points
 
                 if self.is_training:
                     self.consecutive_goals = 0
-                    #self.score_history.append(self.episode_reward)
                 else:
                     self.goal_to_solve_idx += 1
                     if self.goal_to_solve_idx == len(self.goal_x_list):
@@ -467,7 +327,6 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         Create n_sectors sectors and compute the average of their laser readings,
         then return those averages as a list
         """
-        #self.episode_done = False
         
         readings_buffer = []
         sector_readings_avg = []
@@ -484,13 +343,11 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
             elif np.isnan(item):
                 readings_buffer.append(self.min_laser_value)
             else:
-                readings_buffer.append(round(item, self.round_value)) # Qui ho rimosso cast a int e messo un round
+                readings_buffer.append(round(item, self.round_value))
                 
             if (self.min_range > item > 0):
                 rospy.loginfo(tcolors.MAGENTA + "Object too close >>> item = " + str(item) + " < " + str(self.min_range) + tcolors.ENDC)
                 self.episode_done = True
-            #else:
-                #rospy.loginfo(tcolors.CYAN + "NOT done Validation >>> item = " + str(item) + " < " + str(self.min_range) + tcolors.ENDC)
 
             if (len(readings_buffer) == n_readings_per_sector):
                 sector_readings_avg.append(sum(readings_buffer) / n_readings_per_sector)
@@ -533,7 +390,6 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
     
         distance = np.linalg.norm(a - b)
     
-        #return round(distance, self.round_value)
         return distance
 
 
@@ -548,21 +404,10 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
 
         heading = goal_angle - yaw
 
-        #if heading > math.pi:
         while(heading > math.pi):
             heading -= 2 * math.pi
 
-        #elif heading < -math.pi:
         while(heading < math.pi):
             heading += 2 * math.pi
 
-        #return round(heading, self.round_value)
         return heading
-
-    def queue_avg(self, queue):
-        total = 0
-
-        for elem in queue:
-            total += elem
-
-        return total / len(queue)

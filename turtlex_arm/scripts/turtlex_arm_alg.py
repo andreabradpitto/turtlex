@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Party inspired by https://github.com/CUN-bjy/gym-ddpg-keras
+
 import rospy
 import gym
 import rospkg
@@ -7,15 +9,9 @@ import os
 import numpy as np
 import time
 from utils import tcolors
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-#import pandas as pd
 from ddpg_actor_critic import ActorNet, CriticNet
 from ddpg_utils import MemoryBuffer, OrnsteinUhlenbeckProcess
-
-# import our training environment
-import turtlex_arm_task #from openai_ros.task_envs.fetch import fetch_test_task
-
+import turtlex_arm_task  # import the training environment
 import rosnode
 
 
@@ -24,13 +20,13 @@ class ddpgAgent():
     Deep Deterministic Policy Gradient(DDPG) Agent
     """
     def __init__(self, env_, is_discrete=False, batch_size=100, w_per=True, buffer_size=20000, outdir='./ddpg_data'):
+
         # gym environments
         self.env = env_
         self.discrete = is_discrete
         self.obs_dim = env_.observation_space.shape[0]
         self.act_dim = env_.action_space.n if is_discrete else env_.action_space.shape[0]
 
-        #self.buffer_size = buffer_size
         self.outdir = outdir
 
         self.action_bound = (env_.action_space.high - env_.action_space.low) / 2 if not is_discrete else 1.
@@ -45,6 +41,7 @@ class ddpgAgent():
         self.buffer = MemoryBuffer(buffer_size, with_per=w_per)
         self.with_per = w_per
         self.batch_size = batch_size
+
         # OU-Noise-Process
         self.noise = OrnsteinUhlenbeckProcess(size=self.act_dim)
 
@@ -79,6 +76,7 @@ class ddpgAgent():
         if self.with_per and (self.buffer.size() <= self.batch_size): return
 
         for _ in range(replay_num_):
+
             # sample from buffer
             states, actions, rewards, dones, new_states, idx = self.sample_batch(self.batch_size)
 
@@ -169,12 +167,12 @@ if __name__ == '__main__':
 
     monitor = rospy.get_param('/turtlex_arm/monitor')
 
-    #n_actions = rospy.get_param('/turtlex_arm/n_actions')    
-    n_observations = rospy.get_param('/turtlex_arm/n_observations')
-
     max_ep_steps = rospy.get_param('/turtlex_arm/max_episode_steps')
 
     load_model = rospy.get_param("/turtlex_arm/load_model")
+
+    n_actions = rospy.get_param('/turtlex_arm/n_actions')
+    n_observations = rospy.get_param('/turtlex_arm/n_observations')
 
     is_training = rospy.get_param('/turtlex_arm/training')
     if is_training:
@@ -187,12 +185,12 @@ if __name__ == '__main__':
     world_name = rospy.get_param('/turtlex_arm/world_name')
 
     rospackage_name = "turtlex_arm"
-    model_name = "turtlex_arm_ddpg"
     environment_name = 'TurtlexArmTask-v0'
 
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path(rospackage_name)
-    outdir = pkg_path + '/scripts/arm_ddpg/' + world_name
+    outdir = pkg_path + '/training_results/' + world_name
+
     if not os.path.exists(outdir):
         os.makedirs(outdir)
         rospy.loginfo("Created folder=" + str(outdir))
@@ -201,7 +199,7 @@ if __name__ == '__main__':
     if monitor: env = gym.wrappers.Monitor(env, outdir, force=True)
 
     try:
-        # Ensure action bound is symmetric
+        # Ensure that the action bound is symmetric
         assert (np.all(env.action_space.high + env.action_space.low) == 0)
         is_discrete = False
         rospy.loginfo('Continuous Action Space')
@@ -215,20 +213,15 @@ if __name__ == '__main__':
     if load_model != False:
         agent.load_weights(load_model)
 
+    rospy.logdebug('State Dimension: ' + str(n_actions))
+    rospy.logdebug('Action Dimension: ' + str(n_observations))
+
     rospy.logdebug(f"env.action_space.high: {env.action_space.high}")
     rospy.logdebug(f"env.action_space.low: {env.action_space.low}")
     rospy.logdebug(f"env.observation_space.high: {env.observation_space.high}")
     rospy.logdebug(f"env.observation_space.low: {env.observation_space.low}")
 
     highest_reward = 0
-
-    """
-    logger = dict(episode=[],reward=[],critic_loss=[])
-    plt.ion()
-    fig1 = plt.figure(1); fig2 = plt.figure(2)
-    ax1 = fig1.add_subplot(111)
-    ax2 = fig2.add_subplot(111)
-    """
 
     start_time = time.time()
 
@@ -252,8 +245,7 @@ if __name__ == '__main__':
             next_state, reward, done, _ = env.step(action)
             
             if is_training:
-                # store the results into buffer
-                agent.memorize(state, action, reward, done, next_state)
+                agent.memorize(state, action, reward, done, next_state)  # store the results into buffer
 
             state = next_state
 
@@ -275,17 +267,8 @@ if __name__ == '__main__':
                 rospy.loginfo(tcolors.CYAN + f"Episode {ep} done" + tcolors.ENDC)
                 rospy.loginfo(tcolors.CYAN + "############### END Step => " + str(step) + tcolors.ENDC)
 
-                """
-                # save reward logs
-                ax1.cla(); ax2.cla()
-                logger['episode'] = range(1, episode_num + 1)
-                logger['reward'].append(reward)
-                logger['critic_loss'].append(agent.critic.critic_loss)
-                df = pd.DataFrame(logger)
-                sns.lineplot(ax=ax1, x='episode', y='reward', data=df)
-                sns.lineplot(ax=ax2, x='episode', y='critic_loss', data=df)
-                """
                 break
+
             else:
                 rospy.loginfo(tcolors.CYAN + f"Episode {ep} NOT done" + tcolors.ENDC)
                 rospy.loginfo(tcolors.CYAN + "############### END Step => " + str(step) + tcolors.ENDC)
@@ -295,10 +278,12 @@ if __name__ == '__main__':
         rospy.loginfo(tcolors.MAGENTA + "Episode: " + str(ep) + " | cumulated_ep_reward: " + str(cumulated_ep_reward) + " | highest_reward: " +
                         str(highest_reward) + " | Final step: " + str(step) + " | Time: %d:%02d:%02d" % (h, m, s) + "\n\n" + tcolors.ENDC)
 
-        if is_training and ep % 20 == 0:
+        if is_training and ep % 20 == 0 and ep != episode_num:
             agent.save_weights(ep)
 
     if not is_training:
         rospy.loginfo(f"\nTest results: {env.solved_counter} / {episode_num}\n")
+    else:
+        agent.save_weights(episode_num)
 
     env.close() # https://stackoverflow.com/questions/64679139

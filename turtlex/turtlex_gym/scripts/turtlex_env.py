@@ -2,14 +2,11 @@ import rospy
 import time
 import numpy as np
 from openai_ros import robot_gazebo_env
-#from std_msgs.msg import Float64
-#from sensor_msgs.msg import JointState
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import LaserScan
 from sensor_msgs.msg import PointCloud2
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
-
 
 
 class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
@@ -79,11 +76,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
 
         self.cmd_vel_pub = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=1)
 
-        #self.controllers_object.reset_controllers()
         self._check_all_systems_ready()
-
-        #self.gazebo.pauseSim() # TODO rimosso dopo aver creato i topic come attributi. Non so perche ma poi ho messo il super in
-                               # turtlex_office all'inizio e ora se faccio andare mi si pausa la simulazione: per questo ho commentato qui
         
         rospy.logdebug("Finished TurtlexEnv INIT...")
 
@@ -194,7 +187,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         Checks that all the publishers are working
         :return:
         """
-        rate = rospy.Rate(10) # 10 Hz
+        rate = rospy.Rate(10)  # 10 Hz
         while self.cmd_vel_pub.get_num_connections() == 0 and not rospy.is_shutdown():
             rospy.logdebug("No subscribers to self.cmd_vel_pub yet, so we wait and try again")
             try:

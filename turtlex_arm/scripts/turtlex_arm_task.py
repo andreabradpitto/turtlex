@@ -3,14 +3,10 @@ import numpy as np
 from gym import utils
 from gym import spaces
 from gym.envs.registration import register
-#from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Point
-
-import random
 from collections import deque
 from utils import tcolors
-
-import turtlex_arm_env #from openai_ros.robot_envs import fetch_env
+import turtlex_arm_env  # task environment
 
 
 register(
@@ -28,13 +24,12 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
 
         turtlex_arm_env.TurtlexArmEnv.__init__(self)
 
-        # We set the reward range, which is not compulsory
+        # We set the reward range, even if it is not compulsory
         self.reward_range = (-np.inf, np.inf)
 
         action_low = np.array(self.joints_min_pos)
         action_high = np.array(self.joints_max_pos)
         self.action_space = spaces.Box(np.float32(action_low), np.float32(action_high))
-        #self.action_space = spaces.Discrete(self.n_actions)
 
         ee_min_x = self.ee_bounds["x"][0]
         ee_max_x = self.ee_bounds["x"][1]
@@ -52,15 +47,14 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
         obs_low = np.concatenate((action_low, goal_low_pos, observations_low_dist))
         obs_high = np.concatenate((action_high, goal_high_pos, observations_high_dist))
 
-        self.observation_space = spaces.Box(np.float32(obs_low), np.float32(obs_high)) # era 3D position ee (3), current distance from goal (1) = 4 observations; ora sono 9
+        self.observation_space = spaces.Box(np.float32(obs_low), np.float32(obs_high))
 
         self.goal_to_solve_idx = 0
 
         self.desired_ee_goal = Point()
 
-        self.overall_reward = 0 # sum of the rewards of all the previous and current episodes
-        self.overall_steps = 0 # sum of the steps of all the previous and current episodes
-        self.score_hist_length = 30
+        self.overall_reward = 0  # sum of the rewards of all the previous and current episodes
+        self.overall_steps = 0  # sum of the steps of all the previous and current episodes
         self.score_history = deque(maxlen=self.score_hist_length)
 
         if not self.is_training:
@@ -76,7 +70,6 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
         self.joints_min_pos = rospy.get_param("/turtlex_arm/joints_min_pos")
         self.joints_max_pos = rospy.get_param("/turtlex_arm/joints_max_pos")
 
-        #self.n_actions = rospy.get_param('/turtlex_arm/n_actions')
         self.n_observations = rospy.get_param('/turtlex_arm/n_observations')
 
         self.round_value = rospy.get_param("/turtlex_arm/rounding_value")
@@ -87,11 +80,7 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
         self.reached_goal_reward = rospy.get_param('/turtlex_arm/reached_goal_reward')
 
         self.init_joint_pos = rospy.get_param('/turtlex_arm/init_joint_pos')
-        #self.setup_ee_pos = rospy.get_param('/turtlex_arm/setup_ee_pos')
         self.goal_ee_pos = rospy.get_param('/turtlex_arm/ee_goals')
-        #self.goal_ee_pos_x = rospy.get_param('/turtlex_arm/ee_goals/x')
-        #self.goal_ee_pos_y = rospy.get_param('/turtlex_arm/ee_goals/y')
-        #self.goal_ee_pos_z = rospy.get_param('/turtlex_arm/ee_goals/z')
         self.ee_bounds = rospy.get_param('/turtlex_arm/ee_bounds')
         self.max_distance = rospy.get_param('/turtlex_arm/max_distance')
 
@@ -99,28 +88,18 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
 
         self.is_training = rospy.get_param('/turtlex_arm/training')
 
-        
-        #self.desired_position = [self.goal_ee_pos["x"], self.goal_ee_pos["y"], self.goal_ee_pos["z"]]
-        #self.gripper_rotation = [1., 0., 1., 0.]
+        self.score_hist_length = rospy.get_param('/turtlex_arm/score_hist_length')
 
     def _set_init_pose(self):
         """
         Sets the robot in its init pose
         The Simulation will be unpaused for this purpose
         """
-        # Check because it seems its not being used
+        # Check because it seems it is not being used
         rospy.logdebug("self.init_joint_pos=" + str(self.init_joint_pos))
 
-        # Init Joint Pose
-        #rospy.logdebug("Moving to SETUP Joints")
         #self.movement_result = self.set_trajectory_joints(self.init_joint_pos)
-
-        # Get the desired point to reach
-        #self.desired_point = Point()
-        #self.desired_point.x = self.goal_ee_pos_x[0]
-        #self.desired_point.y = self.goal_ee_pos_y[0]
-        #self.desired_point.z = self.goal_ee_pos_z[0]
-
+        # Init Joint Pose
         rospy.logdebug("Moving to INIT POSE Position")
 
         #action = self.create_action(self.init_joint_pos)
@@ -164,8 +143,6 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
         self.desired_ee_goal.x = self.goal_ee_pos["x"][self.goal_to_solve_idx]
         self.desired_ee_goal.y = self.goal_ee_pos["y"][self.goal_to_solve_idx]
         self.desired_ee_goal.z = self.goal_ee_pos["z"][self.goal_to_solve_idx]
-        #self.desired_ee_goal_vector = [self.desired_ee_goal.x, self.desired_ee_goal.y, self.desired_ee_goal.z]
-        #self.gripper_rotation = [1., 0., 1., 0.]
 
         rospy.logdebug("desired_ee_goal.x: " + str(self.desired_ee_goal.x))
         rospy.logdebug("desired_ee_goal.y: " + str(self.desired_ee_goal.y))

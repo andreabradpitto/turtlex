@@ -1,35 +1,25 @@
 turtlex_arm: # namespace. If this is commented, uncomment the namespace in the main launch file
 
-    batch_size: 64 # maximum size of the batches sampled from memory
+    batch_size: 64  # maximum size of the batches sampled from memory
     replay_buffer_size: 20000
 
-    training: True # True for training, False for testing
+    training: True  # True for training, False for testing
     episodes_training: 400
-    test_loops: 1 # number of times to loops through every goal position during testing
-    #episodes_testing: 100
-    #testing_goals: 10
+    test_loops: 1  # number of times to loops through every goal position during testing
     max_episode_steps: 500
-    #n_win_ticks: 50 # if the mean of the rewards is bigger than this value and min_episodes are elapsed, the task is considered finished
-    #min_episodes: 10
 
-    load_model: False # set the NUMBER or 'NAME' of the network to load, set False to skip loading (i.e. train from scratch)
-
-    #running_step: 0.2 # 0.06 # TODO l'ho messo ma non so se lo dovrò implementare come ho fatto per move_base; tecnicamente ho wait=True in group.execute()
+    load_model: False  # set the NUMBER or 'NAME' of the network to load, set False to skip loading (i.e. train from scratch)
 
     monitor: True
-    #quiet: False
 
     # Turtlex-related parameters
-    #n_actions: 5 # future joint positions
+    n_actions: 5 # future joint positions
     n_observations: 9 # Current joint positions (5) + goal position of the end effector (3) + distance of the end effector from the goal (1)
-    #position_ee_max: 1.0
-    #position_ee_min: -1.0
-    #position_delta: 0.1 # increments or decrements in the X/Y/Z positions each action step
 
     joints_min_pos: [-2.617, -1.571, -1.571, -1.745, -2.617]
     joints_max_pos: [ 2.617,  1.571,  1.571,  1.745,  2.617]
 
-    rounding_value: 2 # define how many decimal digits to allow in the observation vector
+    rounding_value: 2  # define how many decimal digits to allow in the observation vector
 
     init_joint_pos: # rest_arm position
       joint_1: 0.0
@@ -48,9 +38,11 @@ turtlex_arm: # namespace. If this is commented, uncomment the namespace in the m
        y: [ -0.36, 0.36]
        z: [ 0.08, 0.63]
 
-    max_distance: 1.0 # maximum distance of the EE to the desired GOAL EE
+    max_distance: 1.0  # maximum distance of the EE to the desired GOAL EE
 
     world_name: 'office'
+
+   score_hist_length: 30
 
     step_punishment: -1
     closer_reward: 10

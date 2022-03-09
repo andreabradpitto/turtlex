@@ -1,36 +1,23 @@
 #!/usr/bin/env python3
 
+# partly inspired by https://github.com/dranaju/project
+
 import rospy
 import numpy as np
 import random
 import copy
-#from std_msgs.msg import Float32
 import torch
+import os
 import torch.nn.functional as F
 from torch.distributions import Normal
 import torch.nn as nn
 from torch.optim import Adam
-
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-#---Directory Path---#
-dirPath = os.path.dirname(os.path.realpath(__file__))
-
+import rospkg
 import gym
 import time
-#import functools
-#from algs import qlearn # training algorithm
-#from task_envs import turtlex_office # training environment
-from gym import wrappers
-#import rospkg
-import turtlex_office # training environment
+import turtlex_office  # task environment
 from utils import tcolors
 import rosnode
-
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-#import pandas as pd
 
 
 # The replay buffer is the agent's memory
@@ -69,7 +56,6 @@ def hard_update(target, source):
 
 def action_unnormalized(action, high, low):
     action = low + (action + 1.0) * 0.5 * (high - low)
-    #action = np.clip(action, low, high)
     return action
 
 class QNetwork(nn.Module):
@@ -135,7 +121,6 @@ class PolicyNetwork(nn.Module):
         std = log_std.exp()
         normal = Normal(mean, std)
         x_t = normal.rsample()
-        #action = torch.tanh(x_t)
         action = (2 * torch.sigmoid(2 * x_t)) - 1
         log_prob = normal.log_prob(x_t)
         log_prob -= torch.log(1 - action.pow(2) + epsilon)
@@ -148,11 +133,9 @@ class SAC(object):
         self.gamma = gamma
         self.tau = tau
         self.alpha = alpha
-        # self.action_range = [action_space.low, action_space.high]
         self.lr=lr
 
         self.target_update_interval = 1
-        #self.automatic_entropy_tuning = False
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -161,14 +144,8 @@ class SAC(object):
         
         self.critic_target = QNetwork(state_dim, action_dim, critic_hidden_dim).to(self.device)
         hard_update(self.critic_target, self.critic)
-
-        #self.value = ValueNetwork(state_dim, value_hidden_dim).to(device=self.device)
-        #self.value_target = ValueNetwork(state_dim, value_hidden_dim).to(self.device)
-        #self.value_optim = Adam(self.value.parameters(), lr=self.lr)
-        #hard_update(self.value_target, self.value)
         
         self.target_entropy = - torch.prod(torch.Tensor([action_dim]).to(self.device)).item()
-        #print('entropy', self.target_entropy)
         rospy.loginfo('Entropy: ' + str(self.target_entropy))
         self.log_alpha = torch.zeros(1, requires_grad=True, device=self.device)
         self.alpha_optim = Adam([self.log_alpha], lr=self.lr)
@@ -183,14 +160,9 @@ class SAC(object):
             action, _, _, _ = self.policy.sample(state)
         else:
             _, _, action, _ = self.policy.sample(state)
-            #action = torch.tanh(action)
             action = (2 * torch.sigmoid(2 * action)) - 1
         action = action.detach().cpu().numpy()[0]
         return action
-    
-    # def rescale_action(self, action):
-    #     return action * (self.action_range[1] - self.action_range[0]) / 2.0 +\
-    #             (self.action_range[1] + self.action_range[0]) / 2.0
     
     def update_parameters(self, memory, batch_size):
         # Sample a batch from memory
@@ -203,8 +175,6 @@ class SAC(object):
         done_batch = torch.FloatTensor(done_batch).to(self.device).unsqueeze(1)
 
         with torch.no_grad():
-            #vf_next_target = self.value_target(next_state_batch)
-            #next_q_value = reward_batch + (1 - done_batch) * self.gamma * (vf_next_target)
             next_state_action, next_state_log_pi, _, _ = self.policy.sample(next_state_batch)
             qf1_next_target, qf2_next_target = self.critic_target(next_state_batch, next_state_action)
             min_qf_next_target = torch.min(qf1_next_target, qf2_next_target) - self.alpha * next_state_log_pi
@@ -225,24 +195,10 @@ class SAC(object):
         min_qf_pi = torch.min(qf1_pi, qf2_pi)
 
         policy_loss = ((self.alpha * log_pi) - min_qf_pi).mean() 
-        # Regularization Loss
-        #reg_loss = 0.001 * (mean.pow(2).mean() + log_std.pow(2).mean())
-        #policy_loss += reg_loss
 
         self.policy_optim.zero_grad()
         policy_loss.backward()
         self.policy_optim.step()
-
-        #vf = self.value(state_batch)
-        
-        #with torch.no_grad():
-        #    vf_target = min_qf_pi - (self.alpha * log_pi)
-
-        #vf_loss = F.mse_loss(vf, vf_target) # 
-
-        #self.value_optim.zero_grad()
-        #vf_loss.backward()
-        #self.value_optim.step()
         
         alpha_loss = -(self.log_alpha * (log_pi + self.target_entropy).detach()).mean()
 
@@ -251,20 +207,13 @@ class SAC(object):
         self.alpha_optim.step()
 
         self.alpha = self.log_alpha.exp()
-        #alpha_tlogs = self.alpha.clone() # For TensorboardX logs
 
-        #if updates % self.target_update_interval == 0:
         soft_update(self.critic_target, self.critic, self.tau)
-
-        #return vf_loss.item(), qf1_loss.item(), qf2_loss.item(), policy_loss.item()
     
     # Save model parameters
-    def save_models(self, episode_count, world_name):
-        torch.save(self.policy, dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + '_policy_net.pth')
-        torch.save(self.critic, dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + '_value_net.pth')
-        # hard_update(self.critic_target, self.critic)
-        # torch.save(soft_q_net.state_dict(), dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + 'soft_q_net.pth')
-        # torch.save(target_value_net.state_dict(), dirPath + '/nav_sac/' + world_name + '/' + str(episode_count) + 'target_value_net.pth')
+    def save_models(self, path, episode_count):
+        torch.save(self.policy, path + '/' + str(episode_count) + '_policy_net.pth')
+        torch.save(self.critic, path + '/' + str(episode_count) + '_value_net.pth')
         rospy.loginfo('''
 
         ====================================
@@ -274,12 +223,10 @@ class SAC(object):
         ''')
     
     # Load model parameters
-    def load_models(self, episode, world_name):
-        self.policy = torch.load(dirPath + '/nav_sac/' + world_name + '/' + str(episode) + '_policy_net.pth', map_location=self.device)
-        self.critic = torch.load(dirPath + '/nav_sac/' + world_name + '/' + str(episode) + '_value_net.pth', map_location=self.device)
+    def load_models(self, path, episode):
+        self.policy = torch.load(path + '/' + str(episode) + '_policy_net.pth', map_location=self.device)
+        self.critic = torch.load(path + '/' + str(episode) + '_value_net.pth', map_location=self.device)
         hard_update(self.critic_target, self.critic)
-        # soft_q_net.load_state_dict(torch.load(dirPath + '/nav_sac/' + world_name + '/'+str(episode) + 'soft_q_net.pth'))
-        # target_value_net.load_state_dict(torch.load(dirPath + '/nav_sac/' + world_name + '/'+str(episode) + 'target_value_net.pth'))
         rospy.loginfo('''
 
         ====================================
@@ -292,7 +239,7 @@ class SAC(object):
 
 if __name__ == '__main__':
 
-    rospy.init_node('turtlex_sac_office', anonymous=True, log_level=rospy.INFO) # change from rospy.WARN to rospy.DEBUG to view all the prints
+    rospy.init_node('turtlex_sac_office', anonymous=True, log_level=rospy.INFO)  # change from rospy.WARN to rospy.DEBUG to view all the prints
     # logging hierarchy: CRITICAL > ERROR > WARNING > INFO > DEBUG; the chosen log level outputs that level and all the ones above it
 
     while('/spawn_turtlex_model' in rosnode.get_node_names()):
@@ -302,7 +249,6 @@ if __name__ == '__main__':
     env = gym.make('MyTurtlexOffice-v0')
     rospy.loginfo("Gym environment created")
 
-    #is_training = rospy.get_param("/turtlex/training")
     is_training = env.is_training
 
     batch_size  = rospy.get_param("/turtlex/batch_size")
@@ -339,27 +285,28 @@ if __name__ == '__main__':
 
     replay_buffer_size = rospy.get_param("/turtlex/replay_buffer_size")
 
+    # Set the logging system
+    rospack = rospkg.RosPack()
+    pkg_path = rospack.get_path('turtlex_gym')
+    outdir = pkg_path + '/training_results/' + world_name
+
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+        rospy.loginfo("Created folder=" + str(outdir))
+
+    env = gym.wrappers.Monitor(env, outdir, force=True)
+    rospy.loginfo("Monitor Wrapper started")
+
     # Create the agent and the replay buffer
     agent = SAC(state_dim, action_dim, gamma, tau, alpha, actor_hidden_dim, critic_hidden_dim, learning_rate)
     replay_buffer = ReplayBuffer(replay_buffer_size)
     if load_model != False:
-        agent.load_models(load_model, world_name)
+        agent.load_models(outdir, load_model)
 
-    rospy.loginfo('State Dimension: ' + str(state_dim))
-    rospy.loginfo('Action Dimension: ' + str(action_dim))
-    rospy.loginfo('Action Minimums: ' + str(action_v_min) + ' m/s and ' + str(action_w_min) + ' rad/s')
-    rospy.loginfo('Action Maximums: ' + str(action_v_max) + ' m/s and ' + str(action_w_max) + ' rad/s')
-
-    # Set the logging system
-    #rospack = rospkg.RosPack()
-    #pkg_path = rospack.get_path('turtlex_gym')
-    #outdir = pkg_path + '/scripts/nav_sac/' + world_name + '/sac_training_results'
-    outdir = dirPath + '/nav_sac/' + world_name + '/sac_training_results'
-    env = wrappers.Monitor(env, outdir, force=True)
-    rospy.loginfo("Monitor Wrapper started")
-
-    #pub_result = rospy.Publisher('/result', Float32, queue_size=5)
-    #result = Float32()
+    rospy.logdebug('State Dimension: ' + str(state_dim))
+    rospy.logdebug('Action Dimension: ' + str(action_dim))
+    rospy.logdebug('Action Minimums: ' + str(action_v_min) + ' m/s and ' + str(action_w_min) + ' rad/s')
+    rospy.logdebug('Action Maximums: ' + str(action_v_max) + ' m/s and ' + str(action_w_max) + ' rad/s')
 
     before_training = 4
 
@@ -370,13 +317,6 @@ if __name__ == '__main__':
 
     highest_reward = 0
 
-    """
-    logger = dict(episode=[],reward=[])
-    plt.ion()
-    fig1 = plt.figure(1)
-    ax1 = fig1.add_subplot(111)
-    """
-
     if not is_training:
         max_episodes = env.testing_goals
 
@@ -386,9 +326,8 @@ if __name__ == '__main__':
 
         rospy.loginfo(tcolors.CYAN + "######################## Beginning episode => " + str(ep) + tcolors.ENDC)
 
-        env.stats_recorder.done = None # CORRETTO DA ME per bug Monitor; andava bene anche "env.stats_recorder.steps = 0", ma sarebbe stato meno corretto
+        env.stats_recorder.done = None
 
-        #done = False
         state = env.reset()
 
         if is_training and not ep % 10 == 0 and len(replay_buffer) > before_training * batch_size:
@@ -449,50 +388,26 @@ if __name__ == '__main__':
 
             if done:
                 rospy.loginfo(tcolors.CYAN + f"Episode {ep}: done" + tcolors.ENDC)
-                #rospy.loginfo(tcolors.CYAN + "############### END Step => " + str(step) + tcolors.ENDC)
-
-                """
-                # save reward logs
-                ax1.cla()
-                logger['episode'] = range(1, max_episodes + 1)
-                logger['reward'].append(reward)
-                df = pd.DataFrame(logger)
-                sns.lineplot(ax=ax1, x='episode', y='reward', data=df)
-                """
 
                 break
             else:
                 rospy.loginfo(tcolors.CYAN + f"Episode {ep}: NOT done" + tcolors.ENDC)
-                #rospy.loginfo(tcolors.CYAN + "############### END Step => " + str(step) + tcolors.ENDC)
 
         m, s = divmod(int(time.time() - start_time), 60)
         h, m = divmod(m, 60)
 
-        #rospy.loginfo(tcolors.MAGENTA + "\nEpisode: " + str(ep) + " | Reward: " + str(env.episode_reward) + " | Final step: " + str(step) +
-        #              " | Avg. reward: " + str(env.episode_reward / step) + " | Time: %d:%02d:%02d" % (h, m, s) + "\n" + tcolors.ENDC)
         rospy.loginfo(tcolors.MAGENTA + "Episode: " + str(ep) + " | Overall reward: " + str(env.overall_reward) + " | Final step: " + str(step) +
                       " | Time: %d:%02d:%02d" % (h, m, s) + "\n\n" + tcolors.ENDC)
 
-        """
-        if ep % 10 == 0:
-            if len(replay_buffer) > before_training * batch_size:
-                #result = env.episode_reward
-                result = env.overall_reward
-                pub_result.publish(result)
-        """
 
-        #pub_result.publish(env.queue_avg(env.score_history))
-
-        if ep % 20 == 0 and is_training:
-            agent.save_models(ep, world_name)
-
-    #if highest_reward < env.episode_reward:
-    #    highest_reward = env.episode_reward
+        if ep % 20 == 0 and ep != max_episodes and is_training:
+            agent.save_models(outdir, ep)
 
     if not is_training:
         rospy.loginfo(f"\nTest results: {env.solved_counter} / {max_episodes}\n")
+    else:
+        agent.save_models(outdir, max_episodes)
 
-    #agent.save_models(max_episodes - 1, world_name)
     rospy.loginfo(tcolors.CYAN + "\n\n| gamma: " + str(gamma) + "| tau: " + str(tau) + "| alpha: " + str(alpha) + "| learning_rate: " +
                     str(learning_rate) + "| max_episodes: " + str(max_episodes) + "| highest_reward: " + str(highest_reward) + "\n\n" + tcolors.ENDC)
 

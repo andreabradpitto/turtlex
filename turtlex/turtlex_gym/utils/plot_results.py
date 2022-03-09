@@ -1,12 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-#print(sys.path)
 import numpy as np
-#print(np.__file__)
-#print(np.__version__)
-#import os
-#import gym
 import matplotlib
 import matplotlib.pyplot as plt
 import itertools
@@ -18,6 +13,8 @@ from gym.wrappers.monitor import load_results # CORRETTO DA ME a causa di funzio
 
 from scipy.interpolate import pchip
 
+WORLD = 'office'
+
 class LivePlot(object):
     def __init__(self, outdir, data_key='episode_rewards', line_color='blue'):
         """
@@ -27,6 +24,7 @@ class LivePlot(object):
             data_key (Optional[str]): The key in the json to graph (episode_rewards or episode_lengths).
             line_color (Optional[dict]): Color of the plot.
         """
+
         #data_key can be set to 'episode_lengths'
         self.outdir = outdir
         self._last_data = None
@@ -102,7 +100,7 @@ if __name__ == '__main__':
     
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path('turtlex_gym')
-    outdir = pkg_path + '/training_results'
+    outdir = pkg_path + '/training_results/' + WORLD
     plotter = LivePlot(outdir)
 
     parser = argparse.ArgumentParser()
@@ -120,7 +118,7 @@ if __name__ == '__main__':
 
     plt_save_path = outdir + "/experiment_data_plot.png"
     plt.savefig(plt_save_path)
-    print ("Saved plot in "+plt_save_path)
+    print ("Saved plot in " + plt_save_path)
     print("Opening Plot in Graphic Tools Window")
     plt.show()
     # pause()

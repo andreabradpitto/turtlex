@@ -1,17 +1,9 @@
 import rospy
 import sys
-#import time
 import numpy as np
-#from std_msgs.msg import Float64
 import geometry_msgs.msg
 from sensor_msgs.msg import JointState
-#from gazebo_msgs.msg import LinkStates
-#import tf
-#from nav_msgs.msg import Odometry
-#import trajectory_msgs.msg
 import moveit_commander
-#import moveit_msgs.msg
-
 from openai_ros import robot_gazebo_env
 
 
@@ -47,8 +39,6 @@ class TurtlexArmEnv(robot_gazebo_env.RobotGazeboEnv):
 
         # Start Services
         self.move_turtlex_arm_object = MoveTurtlexArm()
-
-        self.gazebo.pauseSim() # TODO potrei doverlo commentare
 
     # RobotGazeboEnv virtual methods
     # ----------------------------
@@ -173,6 +163,7 @@ class TurtlexArmEnv(robot_gazebo_env.RobotGazeboEnv):
                 float64 z
                 float64 w
         """
+
         self.gazebo.unpauseSim()
         gripper_pose = self.move_turtlex_arm_object.ee_pose()
         self.gazebo.pauseSim()
@@ -185,7 +176,7 @@ class TurtlexArmEnv(robot_gazebo_env.RobotGazeboEnv):
         
         return gripper_rpy
 
-    def move_joints(self, joints_positions): # TODO funzione mia - alter ego di move_base
+    def move_joints(self, joints_positions):
 
         joint_pos_dict = self.create_joints_dict(joints_positions)
         result = self.set_trajectory_joints(joint_pos_dict)
@@ -252,7 +243,7 @@ class MoveTurtlexArm(object):
 
     def ee_traj(self, pose):
         
-        self.group.set_pose_target(pose) # TODO self.group.set_named_target("NOME") per usare le configurazioni mie        
+        self.group.set_pose_target(pose) # TODO self.group.set_named_target("NOME") per usare le configurazioni mie       
         result = self.execute_trajectory()
         
         return result
