@@ -2,19 +2,22 @@
 <launch>
 <!--crasi tra turtlex_arm_moveit.launch e turtlex_planning_execution.launch (nella cartella turtlex_moveit_config) -->
 
-    <arg name="robot" default="turtlex"/>
-    <arg name="debug" default="false"/>
-    <arg name="gui" default="true"/>
-    <arg name="recording" default="false"/> <!-- previously called "headless" (now deprecated) -->
-    <arg name="paused" default="true"/>
-    <arg name="verbose" default="false"/>
-    <!--<arg name="world_name" value="worlds/empty.world"/>-->
-    <arg name="world_name" value="$(find turtlex_gazebo)/worlds/my_office.world"/>
-    <!--<arg name="world_name" value="$(find turtlex_gazebo)/worlds/my_office_grip_test.world"/>-->
-    <arg name="moveit_controller_manager" default="simple"/> <!-- TODO "simple" / "ros_control" / "andrea" --> <!-- poi da mettere sotto insieme a load_robot_description-->
+    <!-- Set args -->
+    <arg name="robot"           default="turtlex"/>
+    <arg name="debug"           default="false"/>
+    <arg name="gui"             default="true"/>
+    <arg name="recording"       default="false"/> <!-- previously called "headless" (now deprecated) -->
+    <arg name="paused"          default="true"/>
+    <arg name="verbose"         default="false"/>
+    <arg name="use_rviz"        default="true"/>
+    <arg name="world_name"      value="$(find turtlex_gazebo)/worlds/my_office.world"/>
+    <!--<arg name="world_name"      value="$(find turtlex_gazebo)/worlds/my_office_grip_test.world"/>-->
 
-    <arg name="use_rviz" default="true"/>
-    <arg name="rviz_config" value="$(find turtlex_moveit_config)/launch/moveit.rviz"/>
+    <arg name="initial_robot_position" doc="Initial robot position of the robot"
+         default=" -x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
+    <arg name="initial_joint_positions" doc="Initial joint configuration of the robot"
+         default=" -J gripper_prismatic_joint_1 0.031 -J gripper_prismatic_joint_2 0.031 -J joint_1 0.0 -J joint_2 -1.0 -J joint_3 1.0 -J joint_4 1.2 -J joint_5 0.0"/>
+    <arg name="world_pose" value="-x 0.0 -y 0.0 -z 0.0"/>
 
     <!-- Start Gazebo with a blank world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -28,14 +31,6 @@
     </include>
 
     <rosparam command="load" file="$(find turtlex_moveit_config)/config/joint_names.yaml"/>
-
-    <!--<arg name="initial_robot_position" doc="Initial robot position of the robot"
-         default=" -x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>-->
-    <arg unless="$(arg use_rviz)" name="initial_robot_position" doc="Initial robot position of the robot" default=" -x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
-    <arg     if="$(arg use_rviz)" name="initial_robot_position" doc="Initial robot position of the robot" default=" -x 0.0 -y 0.0 -z 0.01 -R 0.0 -P 0.0 -Y 0.0"/>
-    <arg name="initial_joint_positions" doc="Initial joint configuration of the robot"
-         default=" -J gripper_prismatic_joint_1 0.031 -J gripper_prismatic_joint_2 0.031 -J joint_1 0.0 -J joint_2 -1.0 -J joint_3 1.0 -J joint_4 1.2 -J joint_5 0.0"/>
-    <arg name="world_pose" value="-x 0.0 -y 0.0 -z 0.0"/>
 
     <!-- include robot -->
     <arg name="urdf_file" default="$(find xacro)/xacro '$(find turtlex_description)/robots/turtlex_main.urdf.xacro'" />
@@ -84,11 +79,14 @@
         <arg name="info" value="true"/>
         <arg name="debug" value="$(arg debug)"/>
         <arg name="load_robot_description" value="true" /> <!-- TODO da provare anche "false" -->
-        <arg name="moveit_controller_manager" value="$(arg moveit_controller_manager)"/>
+        <arg name="moveit_controller_manager"   value="simple"/> <!-- TODO "simple" / "ros_control" / "andrea" -->
     </include>
 
     <!-- Run RViz and load the default config to see the state of the move_group node -->
     <group if="$(arg use_rviz)">
+
+        <arg name="rviz_config" value="$(find turtlex_moveit_config)/launch/moveit.rviz"/>
+
         <!--<arg name="debug" default="false" />-->
         <arg unless="$(arg debug)" name="launch_prefix" value="" />
         <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />

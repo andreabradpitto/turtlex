@@ -9,13 +9,14 @@
   <arg name="recording"         default="false"/> <!-- previously called "headless" (now deprecated) -->
   <arg name="debug"             default="false"/>
   <arg name="verbose"           default="true"/>
-  <!--<arg name="world_name"      value="$(find turtlex_gazebo)/worlds/maze_loop_brick.world"/>-->
-  <!--<arg name="world_name"      value="$(find turtlex_gazebo)/worlds/empty_wall.world"/>-->
-  <!--<arg name="world_name"      value="$(find turtlex_gazebo)/worlds/small_office.world"/>-->
-  <!--<arg name="world_name"      value="$(find turtlex_gazebo)/worlds/prova.sdf"/>-->
-  <!--<arg name="world_name"      value="$(find turtlex_gazebo)/worlds/office_vuoto.sdf"/>-->
-  <arg name="world_name" value="$(find turtlex_gazebo)/worlds/my_office.world"/>
-  <!--<arg name="world_name" value="$(find turtlex_gazebo)/worlds/my_office_complete.world"/>-->
+  <arg name="use_rviz"          default="false"/>
+  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/maze_loop_brick.world"/>-->
+  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/empty_wall.world"/>-->
+  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/small_office.world"/>-->
+  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/prova.sdf"/>-->
+  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/office_vuoto.sdf"/>-->
+  <arg name="world_name"        value="$(find turtlex_gazebo)/worlds/my_office.world"/>
+  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/my_office_complete.world"/>-->
 
   <arg name="initial_robot_position" doc="Initial robot position of the robot"
         default=" -x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
@@ -58,9 +59,6 @@
         args="$(optenv ROBOT_INITIAL_POSE) -urdf -param robot_description $(arg unpause)
               -model $(arg robot) $(arg world_pose) $(arg initial_robot_position) $(arg initial_joint_positions)"/>
 
-  <!-- Launch RViz -->
-  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlex_gazebo)/config/config.rviz"/>-->
-
   <!-- Velocity muxer -->
   <node name="mobile_base_nodelet_manager" pkg="nodelet" type="nodelet" args="manager"/> <!-- Serve ? -->
   <!-- <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
@@ -88,8 +86,26 @@
     <param name="publish_frequency" type="double" value="30.0"/> <!-- prova anche value="5.0" -->
   </node>
 
+  <!-- Run RViz and load the default config -->
+  <group if="$(arg use_rviz)">
+      <arg name="rviz_config" value="$(find turtlex_gazebo)/config/config.rviz"/>
+
+      <!--<arg name="debug" default="false" />-->
+      <arg unless="$(arg debug)" name="launch_prefix" value="" />
+      <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
+
+      <!--<arg name="rviz_config" default="" />-->
+      <arg     if="$(eval rviz_config=='')" name="command_args" value="" />
+      <arg unless="$(eval rviz_config=='')" name="command_args" value="-d $(arg rviz_config)" />
+
+      <node name="$(anon rviz)" launch-prefix="$(arg launch_prefix)" pkg="rviz" type="rviz" respawn="false"
+              args="$(arg command_args)" output="screen">
+      </node>
+  </group>
+
   <!-- AGGIUNTO PER RGBD CAMERA, MA MI SA CHE E PER ROBOT VERO -->
   <!--<include file="$(find turtlex_description)/launch/xtion_pro_sensor.launch"/>-->
+
 
   <!-- This version uses the openai_ros environments -->
   <!--<rosparam command="load" file="$(find turtlex_gym)/config/turtlex_openai_qlearn_params.yaml"/>--> <!-- ok for maze and the one with "start_qlearning.py" -->
