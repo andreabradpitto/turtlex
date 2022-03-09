@@ -16,6 +16,8 @@ from ddpg_utils import MemoryBuffer, OrnsteinUhlenbeckProcess
 # import our training environment
 import turtlex_arm_task #from openai_ros.task_envs.fetch import fetch_test_task
 
+import rosnode
+
 
 class ddpgAgent():
     """
@@ -158,6 +160,9 @@ if __name__ == '__main__':
 
     rospy.init_node('turtlex_arm_algorithm', anonymous=True, log_level=rospy.DEBUG)
     # logging hierarchy: CRITICAL > ERROR > WARNING > INFO > DEBUG; the chosen log level outputs that levels and all the ones above it
+
+    while('/spawn_turtlex_model' in rosnode.get_node_names()):
+        pass
 
     batch_size = rospy.get_param('/turtlex_arm/batch_size')
     buffer_size = rospy.get_param('/turtlex_arm/replay_buffer_size')

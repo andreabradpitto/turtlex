@@ -30,12 +30,12 @@
     <rosparam command="load" file="$(find turtlex_moveit_config)/config/joint_names.yaml"/>
 
     <!--<arg name="initial_robot_position" doc="Initial robot position of the robot"
-         default=" -x 0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>-->
-    <arg unless="$(arg use_rviz)" name="initial_robot_position" doc="Initial robot position of the robot" default=" -x 0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
-    <arg     if="$(arg use_rviz)" name="initial_robot_position" doc="Initial robot position of the robot" default=" -x 0 -y 0.0 -z 0.01 -R 0.0 -P 0.0 -Y 0.0"/>
+         default=" -x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>-->
+    <arg unless="$(arg use_rviz)" name="initial_robot_position" doc="Initial robot position of the robot" default=" -x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
+    <arg     if="$(arg use_rviz)" name="initial_robot_position" doc="Initial robot position of the robot" default=" -x 0.0 -y 0.0 -z 0.01 -R 0.0 -P 0.0 -Y 0.0"/>
     <arg name="initial_joint_positions" doc="Initial joint configuration of the robot"
-         default=" -J gripper_prismatic_joint_1 0.031 -J gripper_prismatic_joint_2 0.031 -J joint_1 0 -J joint_2 -1 -J joint_3 1 -J joint_4 1.2 -J joint_5 0"/>
-    <arg name="world_pose" value="-x 0 -y 0 -z 0"/>
+         default=" -J gripper_prismatic_joint_1 0.031 -J gripper_prismatic_joint_2 0.031 -J joint_1 0.0 -J joint_2 -1.0 -J joint_3 1.0 -J joint_4 1.2 -J joint_5 0.0"/>
+    <arg name="world_pose" value="-x 0.0 -y 0.0 -z 0.0"/>
 
     <!-- include robot -->
     <arg name="urdf_file" default="$(find xacro)/xacro '$(find turtlex_description)/robots/turtlex_main.urdf.xacro'" />
@@ -62,13 +62,14 @@
     <!-- Gazebo model spawner -->
     <arg name="unpause" value="$(eval '-unpause' if arg('paused') else '')"/>
     <!--<arg name="unpause" value=""/>-->
-    <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-          args="$(optenv ROBOT_INITIAL_POSE) -urdf -param robot_description $(arg unpause) -model $(arg robot) $(arg world_pose) $(arg initial_robot_position) $(arg initial_joint_positions)"/>
+    <node name="spawn_turtlex_model" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+          args="$(optenv ROBOT_INITIAL_POSE) -urdf -param robot_description $(arg unpause)
+                -model $(arg robot) $(arg world_pose) $(arg initial_robot_position) $(arg initial_joint_positions)"/>
 
     <!--<node name="prepare_robot" pkg="turtlex_moveit_config" type="prepare_simulated_robot.py" />-->
 
     <!-- Velocity muxer -->
-    <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/> <!-- Serve ? -->
+    <node name="mobile_base_nodelet_manager" pkg="nodelet" type="nodelet" args="manager"/> <!-- Serve ? -->
 
     <!-- If needed, broadcast static tf for robot root -->
     <!--<node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 odom base_footprint" />--> <!-- Questo se non ho virtual joint non credo serva -->

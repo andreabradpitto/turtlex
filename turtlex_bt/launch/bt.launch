@@ -3,33 +3,30 @@
 <!--<group ns="turtlex">--> <!-- If this is uncommented, comment the namespace in turltlex_gym/config/*-->
 
   <!-- Set args -->
-  <arg name="paused"            default="false"/>
+  <arg name="robot"             default="turtlex"/>
+  <arg name="paused"            default="true"/>
   <arg name="gui"               default="true"/>
   <arg name="recording"         default="false"/> <!-- previously called "headless" (now deprecated) -->
+  <arg name="debug"             default="false"/>
+  <arg name="verbose"           default="true"/>
+  <!--<arg name="world_name" value="$(find turtlex_gazebo)/worlds/my_office.world"/>-->
+  <arg name="world_name" value="$(find turtlex_gazebo)/worlds/my_office_complete.world"/>
 
-  <arg name="x"                 value="0.0"/>
-  <arg name="y"                 value="0.0"/>
-  <arg name="z"                 value="0.0"/>
-  <arg name="roll"              value="0.0"/>
-  <arg name="pitch"             value="0.0"/>
-  <arg name="yaw"               value="0.0"/>
-  <arg name="joint_1"           value="0.0"/>
-  <arg name="joint_2"           value="-1.0"/>
-  <arg name="joint_3"           value="1.0"/>
-  <arg name="joint_4"           value="1.2"/>
-  <arg name="joint_5"           value="0.0"/>
-  <arg name="gripper_joint_1"   value="0.0104"/>
-  <arg name="gripper_joint_2"   value="0.0104"/>
+  <arg name="initial_robot_position" doc="Initial robot position of the robot"
+        default=" -x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>
+  <arg name="initial_joint_positions" doc="Initial joint configuration of the robot"
+        default=" -J gripper_prismatic_joint_1 0.031 -J gripper_prismatic_joint_2 0.031 -J joint_1 0.0 -J joint_2 -1.0 -J joint_3 1.0 -J joint_4 1.2 -J joint_5 0.0"/>
+  <arg name="world_pose" value="-x 0.0 -y 0.0 -z 0.0"/>
 
-  <!-- include world -->
+  <!-- Start Gazebo with a blank world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="use_sim_time"    value="true"/>
-    <arg name="debug"           value="false"/>
-    <arg name="verbose"         value="true"/>
-    <arg name="recording"       value="$(arg recording)"/>
-    <arg name="gui"             value="$(arg gui)"/>
-    <arg name="paused"          value="$(arg paused)"/>
-    <arg name="world_name"      value="$(find turtlex_gazebo)/worlds/my_office_complete.world"/>
+      <arg name="debug" value="$(arg debug)" />
+      <arg name="gui" value="$(arg gui)" />
+      <arg name="paused" value="$(arg paused)"/>
+      <arg name="verbose" value="$(arg verbose)"/>
+      <arg name="use_sim_time" value="true"/>
+      <arg name="recording" value="$(arg recording)"/>
+      <arg name="world_name" default="$(arg world_name)"/>
   </include>
 
   <!-- include robot -->
@@ -39,51 +36,36 @@
   <!-- Load joint controller configurations from YAML file to parameter server -->
   <rosparam file="$(find turtlex_description)/config/widowx.yaml" command="load"/>
   <!-- load the controllers -->           <!-- QUI HO TOLTO ns="/turtlex" -->
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-            output="screen" args="joint_state_controller joint_1_position_controller joint_2_position_controller
-                                  joint_3_position_controller joint_4_position_controller joint_5_position_controller
-                                  gripper_prismatic_joint_1_position_controller gripper_prismatic_joint_2_position_controller"/>
-    <!-- joint_state_controller is the one providing the /joint_states topic -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        output="screen" args="joint_state_controller joint_1_position_controller joint_2_position_controller
+                              joint_3_position_controller joint_4_position_controller joint_5_position_controller
+                              gripper_prismatic_joint_1_position_controller gripper_prismatic_joint_2_position_controller"/>
+  <!-- joint_state_controller is the one providing the /joint_states topic -->
   <!-- convert joint states to TF transforms for rviz, etc -->
   <!--<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
     respawn="false" output="screen">
     <remap from="/joint_states" to="/turtlex/joint_states" />-->
 
-  <!-- Gazebo model spawner -->           <!-- QUI HO TOLTO -unpause negli args, davanti a -urdf -->
-  <node name="spawn_turtlex_model" pkg="gazebo_ros" type="spawn_model"
-        args="$(optenv ROBOT_INITIAL_POSE) -urdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)
-              -J joint_1 $(arg joint_1) -J joint_2 $(arg joint_2) -J joint_3 $(arg joint_3)
-              -J joint_4 $(arg joint_4) -J joint_5 $(arg joint_5) -J gripper_prismatic_joint_1 $(arg gripper_joint_1)
-              -J gripper_prismatic_joint_2 $(arg gripper_joint_2) -param robot_description -model mobile_base"/> <!--Questo mobile_base serve?!-->
-
-  <!-- Launch RViz -->
-  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlex_gazebo)/config/config.rviz"/>-->
+  <!-- Gazebo model spawner -->
+  <arg name="unpause" value="$(eval '-unpause' if arg('paused') else '')"/>
+  <!--<arg name="unpause" value=""/>-->
+  <node name="spawn_turtlex_model" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+        args="$(optenv ROBOT_INITIAL_POSE) -urdf -param robot_description $(arg unpause)
+              -model $(arg robot) $(arg world_pose) $(arg initial_robot_position) $(arg initial_joint_positions)"/>
 
   <!-- Velocity muxer -->
-  <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/> <!-- Serve ? -->
-  <!-- <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
-        args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
-    <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
-    <remap from="cmd_vel_mux/output" to="mobile_base/commands/velocity"/>
-  </node> -->
-
-  <!-- Fake laser -->
-  <!--<node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
-  <node pkg="nodelet" type="nodelet" name="depthimage_to_laserscan"
-        args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet laserscan_nodelet_manager">
-    <param name="scan_height" value="10"/>
-    <param name="output_frame_id" value="/camera_depth_frame"/>
-    <param name="range_min" value="0.45"/>
-    <remap from="image" to="/camera/depth/image_raw"/>
-    <remap from="scan" to="/scan"/>
-  </node>-->
+  <node name="mobile_base_nodelet_manager" pkg="nodelet" type="nodelet" args="manager"/> <!-- Serve ? -->
   
   <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>--> <!-- Se lancio la sim in Gazebo questo va in conflitto su /joint_states -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="/source_list">[/joint_states]</rosparam>
+  </node>
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="30.0"/> <!-- prova anche value="5.0" -->
   </node>
 
-  <node pkg="turtlex_bt" name="turtlex_behavior_tree" type="turtlex_bt.py" output="screen"/>
+
+  <!--<node pkg="turtlex_bt" name="turtlex_behavior_tree" type="turtlex_bt.py" output="screen"/>-->
 
 <!--</group>-->
 </launch>

@@ -6,9 +6,11 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 
 ## 📂 Repository structure
 
-- [doc](doc): folder containing the 2 versions of the assignment specifications
+- [task_behavior_engine](task_behavior_engine), [task_behavior_msgs](task_behavior_msgs), [task_behavior_ros](task_behavior_ros): forked from [Toyota Research Institute](https://github.com/ToyotaResearchInstitute)
 
-- [src](src): folder containing the source code of the assignment
+- [rosnode](rosnode): forked from [ros_comm](https://github.com/ros/ros_comm)
+
+- [turtlex](turtlex): TODO
 
 - [.gitignore](.gitignore): hidden file that specifies which files and folders are not relevant for [Git](https://git-scm.com/)
 
@@ -18,31 +20,31 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 
 ## ❗ Software requirements
 
-- A [**POSIX**](https://en.wikipedia.org/wiki/POSIX)-compliant machine
-- [GCC](https://gcc.gnu.org/) compiler collection
-- At least 1 MB of free disk space
+- [ROS Noetic](http://wiki.ros.org/noetic/Installation) (full installation recommended)
+- [openai_ros](https://bitbucket.org/theconstructcore/openai_ros/src/kinetic-devel/)
+- [OpenaAI Gym](https://gym.openai.com/docs/)
+- [PyTorch](https://pytorch.org/get-started/locally/)
+- [TensorFlow](https://www.tensorflow.org/install/)
+- [OpenCV](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)
 
 ## ✅ Installation
 
 In order to create the executables, open a terminal, move to this folder, and then run:
 
 ```bash
-make
+cd catkin_ws/src
+git clone https://github.com/andreabradpitto/turtlex.git
+cd ..
+catkin_make
 ```
 
-The make file will take care of compiling all the code needed.  
-If you want to remove the executables (and the log file), instead type:
-
-```bash
-make clean
-```
-<!--
 ## ▶️ Execution
 
-## ℹ️ Additional information
+After re-sourcing (i.e., move back to the `catkin_ws` folder with `cd ..`, then type `source devel/setup.bash` and confirm) or opening a new terminal emulator, execute:
 
-## 📊 Results
--->
+```bash
+roslaunch turtlex_bt bt.launch
+```
 
 ## 📫 Author
 

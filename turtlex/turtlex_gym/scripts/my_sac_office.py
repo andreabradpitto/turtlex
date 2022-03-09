@@ -26,6 +26,7 @@ from gym import wrappers
 #import rospkg
 import turtlex_office # training environment
 from utils import tcolors
+import rosnode
 
 #import matplotlib.pyplot as plt
 #import seaborn as sns
@@ -293,6 +294,9 @@ if __name__ == '__main__':
 
     rospy.init_node('turtlex_sac_office', anonymous=True, log_level=rospy.INFO) # change from rospy.WARN to rospy.DEBUG to view all the prints
     # logging hierarchy: CRITICAL > ERROR > WARNING > INFO > DEBUG; the chosen log level outputs that level and all the ones above it
+
+    while('/spawn_turtlex_model' in rosnode.get_node_names()):
+        pass
 
     # Create the Gym environment
     env = gym.make('MyTurtlexOffice-v0')
