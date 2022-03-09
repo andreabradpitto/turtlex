@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-<!--<group ns="turtlex">--> <!-- If this is uncommented, comment the namespace in turltlex_gym/config/*-->
+<!--<group ns="turtlex">-->
 
   <!-- Set args -->
   <arg name="robot"             default="turtlex"/>
@@ -10,11 +10,6 @@
   <arg name="debug"             default="false"/>
   <arg name="verbose"           default="true"/>
   <arg name="use_rviz"          default="false"/>
-  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/maze_loop_brick.world"/>-->
-  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/empty_wall.world"/>-->
-  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/small_office.world"/>-->
-  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/prova.sdf"/>-->
-  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/office_vuoto.sdf"/>-->
   <arg name="world_name"        value="$(find turtlex_gazebo)/worlds/my_office.world"/>
   <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/my_office_complete.world"/>-->
 
@@ -40,7 +35,7 @@
   <param name="robot_description" command="$(arg urdf_file)"/>
 
   <!-- Load joint controller configurations from YAML file to parameter server -->
-  <rosparam file="$(find turtlex_description)/config/widowx.yaml" command="load"/>
+  <rosparam file="$(find turtlex_description)/config/turtlex.yaml" command="load"/>
   <!-- load the controllers -->           <!-- QUI HO TOLTO ns="/turtlex" -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
         output="screen" args="joint_state_controller joint_1_position_controller joint_2_position_controller

@@ -1,1 +1,0 @@
-Codice un po' vecchio in cui mando io i comandi agli attuatori dei joint al posto di moveit. Forse non la soluzione ottimale dato che mi devo trovare "a mano" se la rete neurale ha fatto assumere al braccio una posizione errata/impossibile
