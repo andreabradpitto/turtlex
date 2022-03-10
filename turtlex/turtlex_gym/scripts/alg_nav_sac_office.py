@@ -409,7 +409,7 @@ if __name__ == '__main__':
     else:
         agent.save_models(outdir, max_episodes)
 
-    rospy.loginfo(tcolors.CYAN + "\n\n| gamma: " + str(gamma) + "| tau: " + str(tau) + "| alpha: " + str(alpha) + "| learning_rate: " +
-                    str(learning_rate) + "| max_episodes: " + str(max_episodes) + "| highest_reward: " + str(highest_reward) + "\n\n" + tcolors.ENDC)
+    rospy.loginfo(tcolors.CYAN + "\n\n| gamma: " + str(gamma) + " | tau: " + str(tau) + " | alpha: " + str(alpha) + " | learning_rate: " +
+                    str(learning_rate) + " | max_episodes: " + str(max_episodes) + " | highest_reward: " + str(highest_reward) + "\n\n" + tcolors.ENDC)
 
     env.close()  # Known issue: https://stackoverflow.com/questions/64679139
