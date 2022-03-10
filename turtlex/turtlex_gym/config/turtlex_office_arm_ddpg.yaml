@@ -10,7 +10,7 @@ turtlex_arm: # namespace. If this is commented, uncomment the namespace in the m
 
     load_model: False  # set the NUMBER or 'NAME' of the network to load, set False to skip loading (i.e. train from scratch)
 
-    monitor: True  # Dedice whether to start the Gym Monitor Wrapper or not
+    monitor: True  # Dedice whether to start the Gym Monitor wrapper or not
 
     # Turtlex-related parameters
     n_actions: 5 # future joint positions

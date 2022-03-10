@@ -397,8 +397,8 @@ if __name__ == '__main__':
         m, s = divmod(int(time.time() - start_time), 60)
         h, m = divmod(m, 60)
 
-        rospy.loginfo(tcolors.MAGENTA + "Episode: " + str(ep) + " | Overall reward: " + str(env.overall_reward) + " | Final step: " + str(step) +
-                      " | Time: %d:%02d:%02d" % (h, m, s) + "\n\n" + tcolors.ENDC)
+        rospy.loginfo(tcolors.MAGENTA + "| Episode: " + str(ep) + " | Overall reward: " + str(env.overall_reward) + " | Final step: " + str(step) +
+                      " | Time: %d:%02d:%02d" % (h, m, s) + " |\n\n" + tcolors.ENDC)
 
 
         if ep % 20 == 0 and ep != max_episodes and is_training:
@@ -410,6 +410,6 @@ if __name__ == '__main__':
         agent.save_models(outdir, max_episodes)
 
     rospy.loginfo(tcolors.CYAN + "\n\n| gamma: " + str(gamma) + " | tau: " + str(tau) + " | alpha: " + str(alpha) + " | learning_rate: " +
-                    str(learning_rate) + " | max_episodes: " + str(max_episodes) + " | highest_reward: " + str(highest_reward) + "\n\n" + tcolors.ENDC)
+                    str(learning_rate) + " | max_episodes: " + str(max_episodes) + " | highest_reward: " + str(highest_reward) + " |\n\n" + tcolors.ENDC)
 
     env.close()  # Known issue: https://stackoverflow.com/questions/64679139
