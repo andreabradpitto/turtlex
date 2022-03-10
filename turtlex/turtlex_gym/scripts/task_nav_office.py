@@ -61,6 +61,7 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
         self.consecutive_goals = 0
         self.consecutive_goal_threshold = 10
 
+        #self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.testing_goals)  # Uncomment to perform training with random goals
         if not(self.is_training):
             self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.testing_goals)
             self.solved_counter = 0
