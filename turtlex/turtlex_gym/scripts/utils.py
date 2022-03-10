@@ -5,8 +5,7 @@ import torch
 # sync_networks across the different cores
 def sync_networks(network):
     """
-    network is the network you want to sync
-
+    Network is the network you want to sync
     """
     comm = MPI.COMM_WORLD
     flat_params, params_shape = _get_flat_params(network)
