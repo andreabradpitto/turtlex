@@ -10,11 +10,11 @@ from utils import tcolors
 import turtlex_env  # Robot environment
 
 
-register(id='MyTurtlexOffice-v0',
-        entry_point='turtlex_office:MyTurtlexOfficeEnv',
+register(id='TaskNavOffice-v0',
+        entry_point='task_nav_office:TaskNavOfficeEnv',
         max_episode_steps=10000)
 
-class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
+class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
 
     def __init__(self):
         """
@@ -24,7 +24,7 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
         
         self.get_params()
 
-        super(MyTurtlexOfficeEnv, self).__init__()
+        super(TaskNavOfficeEnv, self).__init__()
 
         # We set the reward range, even if it is not compulsory
         self.reward_range = (-np.inf, np.inf)

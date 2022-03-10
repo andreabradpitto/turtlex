@@ -6,22 +6,22 @@ from gym.envs.registration import register
 from geometry_msgs.msg import Point
 from collections import deque
 from utils import tcolors
-import turtlex_arm_env  # Robot environment
+import turtlex_env  # Robot environment
 
 
-register(id='TurtlexArmTask-v0',
-        entry_point='turtlex_arm_task:TurtlexArmTaskEnv',
+register(id='TaskArmOffice-v0',
+        entry_point='task_arm_office:TaskArmOfficeEnv',
         max_episode_steps=10000)
 
-class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
+class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
 
     def __init__(self):
         
-        rospy.logdebug("Entered TurtlexArmTaskEnv")
+        rospy.logdebug("Entered TaskArmOfficeEnv")
 
         self.get_params()
 
-        turtlex_arm_env.TurtlexArmEnv.__init__(self)
+        turtlex_env.TurtlexEnv.__init__(self)
 
         # We set the reward range, even if it is not compulsory
         self.reward_range = (-np.inf, np.inf)

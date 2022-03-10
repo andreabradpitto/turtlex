@@ -21,6 +21,8 @@ turtlex: # namespace. If this is commented, uncomment the namespace in the main 
 
     running_step: 0.2  # TODO era 0.06, ma mi sa che non veniva usato... # Time for each step (amount of time in which the control will be executed)
 
+    monitor: True  # Dedice whether to start the Gym Monitor Wrapper or not
+
     # define how many decimal digits to allow in the observation vector
     rounding_value: 2
 

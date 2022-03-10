@@ -30,17 +30,22 @@
       <arg name="world_name" default="$(arg world_name)"/>
   </include>
 
-  <rosparam command="load" file="$(find turtlex_moveit_config)/config/joint_names.yaml"/>
-
   <!-- include robot -->
   <arg name="urdf_file" default="$(find xacro)/xacro '$(find turtlex_description)/robots/turtlex_main.urdf.xacro'" />
   <param name="robot_description" command="$(arg urdf_file)"/>
 
-  <!-- Load joint controller parameters for Gazebo -->
-  <!--<rosparam file="$(find turtlex_moveit_config)/config/gazebo_controllers.yaml"/>-->
-  <!-- Load the controllers -->
-  <rosparam file="$(find turtlex_moveit_config)/config/ros_controllers.yaml"/>
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller arm_controller gripper_controller"/>
+  <!-- Load joint controller configurations from YAML file to parameter server -->
+  <rosparam file="$(find turtlex_description)/config/turtlex.yaml" command="load"/>
+  <!-- load the controllers -->           <!-- QUI HO TOLTO ns="/turtlex" -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        output="screen" args="joint_state_controller joint_1_position_controller joint_2_position_controller
+                              joint_3_position_controller joint_4_position_controller joint_5_position_controller
+                              gripper_prismatic_joint_1_position_controller gripper_prismatic_joint_2_position_controller"/>
+  <!-- joint_state_controller is the one providing the /joint_states topic -->
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <!--<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+    respawn="false" output="screen">
+    <remap from="/joint_states" to="/turtlex/joint_states" />-->
 
   <!-- Gazebo model spawner -->
   <arg name="unpause" value="$(eval '-unpause' if arg('paused') else '')"/>
@@ -48,8 +53,6 @@
   <node name="spawn_turtlex_model" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
         args="$(optenv ROBOT_INITIAL_POSE) -urdf -param robot_description $(arg unpause)
               -model $(arg robot) $(arg world_pose) $(arg initial_robot_position) $(arg initial_joint_positions)"/>
-
-  <!--<node name="prepare_robot" pkg="turtlex_moveit_config" type="prepare_simulated_robot.py" />-->
 
   <!-- Velocity muxer -->
   <node name="mobile_base_nodelet_manager" pkg="nodelet" type="nodelet" args="manager"/> <!-- Serve ? -->
@@ -76,20 +79,9 @@
   </node>
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
 
-  <!-- Launch MoveIt -->
-  <include file="$(find turtlex_moveit_config)/launch/move_group.launch">
-      <arg name="publish_monitored_planning_scene" value="true"/>
-      <arg name="info" value="true"/>
-      <arg name="debug" value="$(arg debug)"/>
-      <arg name="load_robot_description" value="true" /> <!-- TODO da provare anche "false" -->
-      <arg name="moveit_controller_manager"   value="simple"/> <!-- TODO "simple" / "ros_control" / "andrea" -->
-  </include>
-
   <!-- Run RViz and load the default config -->
   <group if="$(arg use_rviz)">
-
-      <!--<arg name="rviz_config" value="$(find turtlex_gazebo)/config/config.rviz"/>-->
-      <arg name="rviz_config" value="$(find turtlex_moveit_config)/launch/moveit.rviz"/>
+      <arg name="rviz_config" value="$(find turtlex_gazebo)/config/config.rviz"/>
 
       <!--<arg name="debug" default="false" />-->
       <arg unless="$(arg debug)" name="launch_prefix" value="" />

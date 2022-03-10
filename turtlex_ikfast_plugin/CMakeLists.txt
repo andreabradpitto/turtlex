@@ -39,18 +39,3 @@ install(DIRECTORY include/ DESTINATION include)
 install(FILES turtlex_moveit_ikfast_plugin_description.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

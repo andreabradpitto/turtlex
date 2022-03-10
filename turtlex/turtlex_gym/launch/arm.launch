@@ -36,18 +36,6 @@
     <arg name="urdf_file" default="$(find xacro)/xacro '$(find turtlex_description)/robots/turtlex_main.urdf.xacro'" />
     <param name="robot_description" command="$(arg urdf_file)"/>
 
-    <!--<rosparam file="$(find fetch_gazebo)/config/default_controllers.yaml" command="load" />--> <!-- controller creato per mimare fetch. Da usare con andrea_moveit_controller, ma mi sa che non va niente perche ci vuole un plugin analogo a quello in fetch.gazebo.xacro-->
-
-    <!-- Load joint controller configurations from YAML file to parameter server -->
-    <!--<rosparam file="$(find turtlex_description)/config/widowx.yaml" command="load"/>-->
-    <!-- load the controllers -->
-    <!--<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-            output="screen" args="joint_state_controller joint_1_position_controller joint_2_position_controller
-                                  joint_3_position_controller joint_4_position_controller joint_5_position_controller
-                                  gripper_prismatic_joint_1_position_controller gripper_prismatic_joint_2_position_controller"/>-->
-
-    <!-- joint_state_controller is the one providing the /joint_states topic -->
-
     <!-- Load joint controller parameters for Gazebo -->
     <!--<rosparam file="$(find turtlex_moveit_config)/config/gazebo_controllers.yaml"/>-->
     <!-- Load the controllers -->
@@ -102,9 +90,9 @@
 
 
     <!-- Load the environment parameters file -->
-    <rosparam command="load" file="$(find turtlex_arm)/config/turtlex_arm_ddpg_office.yaml"/>
+    <rosparam command="load" file="$(find turtlex_gym)/config/turtlex_office_arm_ddpg.yaml"/>
     <!-- Launch the training system -->
-    <node pkg="turtlex_arm" name="turtlex_arm_algorithm" type="turtlex_arm_alg.py" output="screen"/>
-    <!--<node pkg="turtlex_arm" name="turtlex_arm_moveit_test" type="turtlex_arm_moveit_test.py" output="screen"/>-->
+    <node pkg="turtlex_gym" name="turtlex_arm_algorithm" type="alg_arm_ddpg_office.py" output="screen"/>
+    <!--<node pkg="turtlex" name="turtlex_arm_moveit_test" type="turtlex_arm_moveit_test.py" output="screen"/>-->
 
 </launch>

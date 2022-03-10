@@ -10,7 +10,7 @@ turtlex_arm: # namespace. If this is commented, uncomment the namespace in the m
 
     load_model: False  # set the NUMBER or 'NAME' of the network to load, set False to skip loading (i.e. train from scratch)
 
-    monitor: True
+    monitor: True  # Dedice whether to start the Gym Monitor Wrapper or not
 
     # Turtlex-related parameters
     n_actions: 5 # future joint positions
@@ -42,7 +42,7 @@ turtlex_arm: # namespace. If this is commented, uncomment the namespace in the m
 
     world_name: 'office'
 
-   score_hist_length: 30
+    score_hist_length: 30
 
     step_punishment: -1
     closer_reward: 10

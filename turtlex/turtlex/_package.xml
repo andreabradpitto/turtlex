@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>turtlex</name>
+  <version>0.0.0</version>
+  <description>
+    ROS packages for the Turtlex (meta package)
+  </description>
+
+  <license>Apache 2.0</license>
+  <license>BSD</license>
+
+  <author>Andrea Pitto</author>
+
+  <maintainer email="s3942710@studenti.unige.it">Andrea Pitto</maintainer>
+  <author email="s3942710@studenti.unige.it">Andrea Pitto</author>
+
+  <url type="website">https://github.com/andreabradpitto/turtlex</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>turtlex_description</exec_depend>
+  <exec_depend>turtlex_gazebo</exec_depend>
+  <exec_depend>turtlex_gym</exec_depend>
+  <exec_depend>turtlex_bt</exec_depend>
+  <exec_depend>turtlex_ikfast_plugin</exec_depend>
+  <exec_depend>turtlex_moveit_config</exec_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

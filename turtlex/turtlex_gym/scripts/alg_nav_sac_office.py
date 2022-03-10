@@ -15,7 +15,7 @@ from torch.optim import Adam
 import rospkg
 import gym
 import time
-import turtlex_office  # task environment
+import task_nav_office  # task environment
 from utils import tcolors
 import rosnode
 
@@ -246,7 +246,7 @@ if __name__ == '__main__':
         pass
 
     # Create the Gym environment
-    env = gym.make('MyTurtlexOffice-v0')
+    env = gym.make('TaskNavOffice-v0')
     rospy.loginfo("Gym environment created")
 
     is_training = env.is_training
@@ -270,6 +270,8 @@ if __name__ == '__main__':
     max_episodes = rospy.get_param("/turtlex/nepisodes")
     max_steps = rospy.get_param("/turtlex/nsteps")
 
+    monitor = rospy.get_param('/turtlex/monitor')
+
     # Bounds for the actions (linear and angular velocities)
     action_v_min = rospy.get_param("/turtlex/action_v_min")
     action_w_min = rospy.get_param("/turtlex/action_w_min")
@@ -288,14 +290,13 @@ if __name__ == '__main__':
     # Set the logging system
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path('turtlex_gym')
-    outdir = pkg_path + '/training_results/' + world_name
+    outdir = pkg_path + '/training_results/' + world_name + '_nav_sac'
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)
         rospy.loginfo("Created folder=" + str(outdir))
 
-    env = gym.wrappers.Monitor(env, outdir, force=True)
-    rospy.loginfo("Monitor Wrapper started")
+    if monitor: env = gym.wrappers.Monitor(env, outdir, force=True)
 
     # Create the agent and the replay buffer
     agent = SAC(state_dim, action_dim, gamma, tau, alpha, actor_hidden_dim, critic_hidden_dim, learning_rate)
@@ -326,7 +327,7 @@ if __name__ == '__main__':
 
         rospy.loginfo(tcolors.CYAN + "######################## Beginning episode => " + str(ep) + tcolors.ENDC)
 
-        env.stats_recorder.done = None
+        if monitor: env.stats_recorder.done = None
 
         state = env.reset()
 

@@ -9,9 +9,9 @@ import os
 import numpy as np
 import time
 from utils import tcolors
-from ddpg_actor_critic import ActorNet, CriticNet
+from ddpg import ActorNet, CriticNet
 from ddpg_utils import MemoryBuffer, OrnsteinUhlenbeckProcess
-import turtlex_arm_task  # import the training environment
+import task_arm_office  # import the training environment
 import rosnode
 
 
@@ -184,12 +184,12 @@ if __name__ == '__main__':
     # Get the world name
     world_name = rospy.get_param('/turtlex_arm/world_name')
 
-    rospackage_name = "turtlex_arm"
-    environment_name = 'TurtlexArmTask-v0'
+    rospackage_name = "turtlex_gym"
+    environment_name = 'TaskArmOffice-v0'
 
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path(rospackage_name)
-    outdir = pkg_path + '/training_results/' + world_name
+    outdir = pkg_path + '/training_results/' + world_name + '_arm_ddpg'
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)

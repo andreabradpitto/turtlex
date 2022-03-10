@@ -60,9 +60,7 @@
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
     <rosparam param="/source_list">[/joint_states]</rosparam>
   </node>
-  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
-    <param name="publish_frequency" type="double" value="30.0"/> <!-- prova anche value="5.0" -->
-  </node>
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
 
 
   <!--<node pkg="turtlex_bt" name="turtlex_behavior_tree" type="turtlex_bt.py" output="screen"/>-->
