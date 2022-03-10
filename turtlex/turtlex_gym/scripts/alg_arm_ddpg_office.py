@@ -6,13 +6,13 @@ import rospy
 import gym
 import rospkg
 import os
-import numpy as np
 import time
-from utils import tcolors
+import numpy as np
 from ddpg import ActorNet, CriticNet
 from ddpg_utils import MemoryBuffer, OrnsteinUhlenbeckProcess
-import task_arm_office  # import the training environment
+from utils import tcolors
 import rosnode
+import task_arm_office  # import the training environment
 
 
 class ddpgAgent():

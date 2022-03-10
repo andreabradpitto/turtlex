@@ -1,6 +1,6 @@
 <package>
   <name>turtlex_gazebo</name>
-  <version>2.2.2</version>
+  <version>0.0.0</version>
   <description>Gazebo launchers and worlds for TurtleBot simulation</description>
   <license>BSD</license>
   <author email="s3942710@studenti.unige.it">Andrea Pitto</author>
@@ -9,7 +9,6 @@
   <buildtool_depend>catkin</buildtool_depend>
   
   <run_depend>yocs_cmd_vel_mux</run_depend>
-<!--  <run_depend>create_gazebo_plugins</run_depend> disable irobot create due to the compile error in plugin-->
   <run_depend>diagnostic_aggregator</run_depend>
   <run_depend>depthimage_to_laserscan</run_depend>
   <run_depend>gazebo_ros</run_depend>

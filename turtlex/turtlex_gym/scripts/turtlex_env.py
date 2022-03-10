@@ -1,14 +1,11 @@
 import rospy
 import time
-from openai_ros import robot_gazebo_env
-from sensor_msgs.msg import Image
-from sensor_msgs.msg import LaserScan
-from sensor_msgs.msg import PointCloud2
-from nav_msgs.msg import Odometry
 import sys
 import numpy as np
-import geometry_msgs.msg
-from sensor_msgs.msg import JointState
+from openai_ros import robot_gazebo_env
+from sensor_msgs.msg import Image, LaserScan, PointCloud2, JointState
+from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Pose, Twist
 import moveit_commander
 
 
@@ -39,7 +36,8 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         * /camera/rgb/image_raw: RGB camera
         * /kobuki/laser/scan: Laser Readings
         
-        Actuators Topic List: /cmd_vel, 
+        Actuators Topic List:
+        * /cmd_vel: set linear and angular velocities
         
         Args:
         """
@@ -59,9 +57,6 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
                                          start_init_physics_parameters=False, # TODO prova a metterlo True
                                          reset_world_or_sim="WORLD")
 
-        self.joint_states_topic = '/joint_states'
-        self.joint_names = ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5"]
-
         self.gazebo.unpauseSim()
 
         self.odometry_topic = "/odom"
@@ -70,6 +65,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         self.rgb_raw_image_topic = "/camera/rgb/image_raw"  # Sensor topic
         self.laser_scan_topic = "/kobuki/laser/scan"  # Sensor topic
         self.cmd_vel_topic = "/cmd_vel"  # Actuator topic
+        self.joint_states_topic = '/joint_states'
 
         # We Start all the ROS related subscribers and publishers
         rospy.Subscriber(self.odometry_topic, Odometry, self._odom_callback)
@@ -78,9 +74,11 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         #rospy.Subscriber(self.rgb_raw_image_topic, Image, self._camera_rgb_image_raw_callback)
         rospy.Subscriber(self.laser_scan_topic, LaserScan, self._laser_scan_callback)
         rospy.Subscriber(self.joint_states_topic, JointState, self.joints_callback)
-        self.joints = JointState()
 
-        self.cmd_vel_pub = rospy.Publisher(self.cmd_vel_topic, geometry_msgs.msg.Twist, queue_size=1)
+        self.cmd_vel_pub = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=1)
+
+        self.joint_names = ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5"]
+        self.joints = JointState()
 
         # Start Services
         self.move_turtlex_arm_object = MoveTurtlexArm()
@@ -239,7 +237,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         See create_action
         """
         # Set up a trajectory message to publish.
-        ee_target = geometry_msgs.msg.Pose()
+        ee_target = Pose()
         ee_target.orientation.w = 1.0
         ee_target.position.x = action[0]
         ee_target.position.y = action[1]
@@ -392,7 +390,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         :param update_rate: Rate at which we check the odometry.
         :return: 
         """
-        cmd_vel_value = geometry_msgs.msg.Twist()
+        cmd_vel_value = Twist()
         cmd_vel_value.linear.x = linear_speed
         cmd_vel_value.angular.z = angular_speed
         rospy.logdebug("Turtlex Base Twist Cmd >> " + str(cmd_vel_value))

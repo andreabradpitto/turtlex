@@ -3,21 +3,21 @@
 # partly inspired by https://github.com/dranaju/project
 
 import rospy
-import numpy as np
 import random
 import copy
 import torch
 import os
+import rospkg
+import gym
+import time
+import numpy as np
 import torch.nn.functional as F
 from torch.distributions import Normal
 import torch.nn as nn
 from torch.optim import Adam
-import rospkg
-import gym
-import time
-import task_nav_office  # task environment
 from utils import tcolors
 import rosnode
+import task_nav_office  # task environment
 
 
 # The replay buffer is the agent's memory
