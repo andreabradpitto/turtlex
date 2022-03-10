@@ -27,7 +27,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         This has to do with the fact that some plugins with tf, dont understand the reset of the simulation
         and need to be reseted to work properly.
         
-        The Sensors: The sensors accesible are the ones considered useful for AI learning.
+        The sensors: The sensors accesible are the ones considered useful for AI learning.
         
         Sensor Topic List:
         * /odom : Odometry readings of the Base of the Robot
@@ -54,7 +54,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         super(TurtlexEnv, self).__init__(controllers_list=self.controllers_list,
                                          robot_name_space=self.robot_name_space,
                                          reset_controls=self.reset_controls,
-                                         start_init_physics_parameters=False, # TODO prova a metterlo True
+                                         start_init_physics_parameters=False,
                                          reset_world_or_sim="WORLD")
 
         self.gazebo.unpauseSim()
@@ -465,8 +465,8 @@ class MoveTurtlexArm(object):
         #result = self.group.go(wait=True)  # This executes the planned trajectory (planned via the previous instruction)
 
         self.plan = self.group.plan()
-        rospy.loginfo("\n\tRISULTATO PLANNING: " + str(self.plan) + "\n")
-        if self.plan[0] == True:  # va bene anche, credo (ancor da testare): "if plan[1].points:"" ; o al massimo "if plan[1].joint_trajectory.points:"
+        rospy.logwarn("\n\tRISULTATO PLANNING: " + str(self.plan) + "\n")
+        if self.plan[0] == True:
             rospy.loginfo("Plan found")
             result = self.group.execute(self.plan[1], wait=True)
         else:

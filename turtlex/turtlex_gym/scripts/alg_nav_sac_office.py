@@ -345,6 +345,8 @@ if __name__ == '__main__':
 
             state = np.float32(state) # attento qui, sotto, unnorm_action, ed a return np.asarray(observations) in _get_obs() + 2 in _init_env_variables
 
+            #env.render()  # openai_ros does not support render for the moment
+
             if is_training and not ep % 10 == 0:
                 action = agent.select_action(state)
             else:

@@ -21,24 +21,6 @@
       <real_time_factor>1</real_time_factor>
       <max_contacts>20</max_contacts>
     </physics>
-    <!-- Questa fisica qui sotto e piuttosto simile e l'ho presa da una risposta online -->
-    <!--<physics type="ode">
-      <gravity>0.000000 0.000000 -9.810000</gravity>
-      <ode>
-        <solver>
-          <type>quick</type>
-          <iters>100</iters>
-          <precon_iters>0</precon_iters>
-          <sor>1.000000</sor>
-        </solver>
-        <constraints>
-          <cfm>0.000000</cfm>
-          <erp>0.500000</erp>
-          <contact_max_correcting_vel>1000.000000</contact_max_correcting_vel>
-          <contact_surface_layer>0.00000</contact_surface_layer>
-        </constraints>
-      </ode>
-    </physics>-->
     <light name='sun' type='directional'>
       <cast_shadows>1</cast_shadows>
       <pose>0 0 10 0 -0 0</pose>
@@ -2454,215 +2436,6 @@
       </link>
       <pose>-4.86972 -7.01077 1e-06 1e-06 7.2e-05 1.57822</pose>
     </model>
-    <!--<model name='table_1'>
-      <static>0</static>
-      <link name='link'>
-        <collision name='surface'>
-          <pose>0 0 1 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>1.5 0.8 0.03</size>
-            </box>
-          </geometry>
-          <surface>
-            <bounce/>
-            <friction>
-              <ode/>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='visual1'>
-          <pose>0 0 1 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>1.5 0.8 0.03</size>
-            </box>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
-            </script>
-          </material>
-        </visual>
-        <collision name='front_left_leg_collision'>
-          <pose>0.68 0.38 0.5 0 -0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.02</radius>
-              <length>1</length>
-            </cylinder>
-          </geometry>
-          <surface>
-            <bounce/>
-            <friction>
-              <ode/>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='front_left_leg'>
-          <pose>0.68 0.38 0.5 0 -0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.02</radius>
-              <length>1</length>
-            </cylinder>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-        </visual>
-        <collision name='front_right_leg_collision'>
-          <pose>0.68 -0.38 0.5 0 -0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.02</radius>
-              <length>1</length>
-            </cylinder>
-          </geometry>
-          <surface>
-            <bounce/>
-            <friction>
-              <ode/>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='front_right_leg'>
-          <pose>0.68 -0.38 0.5 0 -0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.02</radius>
-              <length>1</length>
-            </cylinder>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-        </visual>
-        <collision name='back_right_leg_collision'>
-          <pose>-0.68 -0.38 0.5 0 -0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.02</radius>
-              <length>1</length>
-            </cylinder>
-          </geometry>
-          <surface>
-            <bounce/>
-            <friction>
-              <ode/>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='back_right_leg'>
-          <pose>-0.68 -0.38 0.5 0 -0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.02</radius>
-              <length>1</length>
-            </cylinder>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-        </visual>
-        <collision name='back_left_leg_collision'>
-          <pose>-0.68 0.38 0.5 0 -0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.02</radius>
-              <length>1</length>
-            </cylinder>
-          </geometry>
-          <surface>
-            <bounce/>
-            <friction>
-              <ode/>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <contact>
-              <ode/>
-            </contact>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='back_left_leg'>
-          <pose>-0.68 0.38 0.5 0 -0 0</pose>
-          <geometry>
-            <cylinder>
-              <radius>0.02</radius>
-              <length>1</length>
-            </cylinder>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-        </visual>
-        <velocity_decay>
-          <linear>0</linear>
-          <angular>0</angular>
-        </velocity_decay>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
-        <gravity>1</gravity>
-        <inertial>
-          <pose>0 0 0 0 -0 0</pose>
-          <inertia>
-            <ixx>1</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>1</iyy>
-            <iyz>0</iyz>
-            <izz>1</izz>
-          </inertia>
-          <mass>1</mass>
-        </inertial>
-        <enable_wind>0</enable_wind>
-      </link>
-      <pose>-1.76173 -7.584 -0 0 -0 0</pose>
-    </model>-->
     <model name='cabinet_3'>
       <static>0</static>
       <link name='cabinet_bottom_plate'>
@@ -4220,10 +3993,6 @@
       <pose>-0.52661 -2.63888 0 -1e-06 -0 -1.58492</pose>
     </model>
     <state world_name='default'>
-      <!--<sim_time>8 321000000</sim_time>
-      <real_time>8 358730476</real_time>
-      <wall_time>1638029681 73190845</wall_time>-->
-      <!--<iterations>8321</iterations>-->
       <sim_time>0 0</sim_time>
       <real_time>0 0</real_time>
       <wall_time>0 0</wall_time>
@@ -4418,16 +4187,6 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
-      <!--<model name='table_1'>
-        <pose>-1.76173 -7.584 -1e-06 0 2e-06 0</pose>
-        <scale>1 1 1</scale>
-        <link name='link'>
-          <pose>-1.76173 -7.584 -1e-06 0 2e-06 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>7e-06 0 0.000103 0.000162 0.307358 0</acceleration>
-          <wrench>7e-06 0 0.000103 0 -0 0</wrench>
-        </link>
-      </model>-->
       <model name='not-so-table_box'>
         <pose>-1.76173 -7.53134 0.5 2e-06 -0 0</pose>
         <scale>1.43695 0.864808 1</scale>

@@ -4,20 +4,8 @@
 
 	<xacro:include filename="$(find turtlex_description)/urdf/widowx.urdf.xacro"/>
 
-	<!--<link name="widow_base_footprint">
-		<visual>
-			<origin xyz="0 0 0" rpy="0 0 0"/>
-			<geometry>
-				<box size="0.001 0.001 0.001" />
-			</geometry>
-		</visual>
-	</link>
-	<joint name="fixed" type="fixed">
-    	<parent link="${parent}"/>
-    	<child link="widow_base_footprint"/>
- 	</joint>-->
 	<xacro:widowx_arm parent="${parent}">
-		<!-- moving it a bit backwards in order to leave some space for the laser sensors on the front-->
+		<!-- moving the arm a bit backwards in order to leave some space for the laser sensors on the front -->
 		<origin xyz="-0.007 0.0 0.0" rpy="0.0 0.0 0.0"/>
 	</xacro:widowx_arm>
 

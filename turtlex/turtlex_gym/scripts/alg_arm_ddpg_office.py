@@ -231,7 +231,6 @@ if __name__ == '__main__':
 
         if monitor: env.stats_recorder.done = None
 
-        #done = False
         state = env.reset()
 
         cumulated_ep_reward = 0

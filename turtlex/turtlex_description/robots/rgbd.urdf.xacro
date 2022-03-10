@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot name="rgbd" xmlns:xacro="http://www.ros.org/wiki/xacro">
 <xacro:macro name="rgbd_main" params="parent">
-	<!--<xacro:include filename="$(find turtlex_description)/urdf/common_properties.urdf.xacro"/>-->
 
 	<!-- 3D sensor -->
 	<xacro:include filename="$(find turtlex_description)/urdf/asus_xtion_pro.urdf.xacro"/>
-
-	<!--<link name="rgbd_base_link">
-		<visual>
-			<origin xyz="0 0 0" rpy="0 0 0"/>
-			<geometry>
-				<box size="0.001 0.001 0.001" />
-			</geometry>
-		</visual>
-	</link>-->
 
 	<xacro:sensor_asus_xtion_pro parent="${parent}"/>
 

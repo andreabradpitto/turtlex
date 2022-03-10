@@ -243,7 +243,7 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
                             self.goal_to_solve_idx = 0
 
         else:
-            if self.action_result: # TODO in caso sostituire con un self.goal_reached (da aggiungere anche in init_env_variables() come False e come True in _is_done())
+            if self.action_result:
                 rospy.loginfo(tcolors.CYAN + f"Action's outcome: the robot has reached the goal \
                               {self.desired_ee_goal.x, self.desired_ee_goal.y, self.desired_ee_goal.z}" + tcolors.ENDC)
                 reward = self.reached_goal_reward

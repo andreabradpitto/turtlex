@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?> <!-- NOTA BENE: questa e la asus xtion pro LIVE (quella non live non ha rgb) -->
+<?xml version="1.0" encoding="utf-8"?>
 <robot name="asus_xtion_pro_gazebo" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- ASUS Xtion PRO for simulation -->
+  <!-- ASUS Xtion PRO LIVE for simulation -->
   <xacro:macro name="asus_xtion_pro_sim_3dsensor">
     <gazebo reference="camera_link">  
       <sensor type="depth" name="camera">
@@ -19,10 +19,10 @@
             <far>8.0</far>
           </clip>
         </camera>
-        <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so"> <!-- rinomina come asus_xtion_pro_camera_controller ? -->
+        <plugin name="asus_xtion_pro_camera_controller" filename="libgazebo_ros_openni_kinect.so">
           <cameraName>camera</cameraName>
           <alwaysOn>true</alwaysOn>
-          <updateRate>10</updateRate> <!-- <updateRate>0</updateRate> -->
+          <updateRate>10</updateRate>
           <imageTopicName>rgb/image_raw</imageTopicName>
           <depthImageTopicName>depth/image_raw</depthImageTopicName>
           <pointCloudTopicName>depth/points</pointCloudTopicName>
