@@ -93,6 +93,6 @@
     <rosparam command="load" file="$(find turtlex_gym)/config/turtlex_office_arm_ddpg.yaml"/>
     <!-- Launch the training system -->
     <node pkg="turtlex_gym" name="turtlex_arm_algorithm" type="alg_arm_ddpg_office.py" output="screen"/>
-    <!--<node pkg="turtlex" name="turtlex_arm_moveit_test" type="turtlex_arm_moveit_test.py" output="screen"/>-->
+    <!--<node pkg="turtlex" name="turtlex_arm_moveit_test" type="arm_moveit_test.py" output="screen"/>-->
 
 </launch>
