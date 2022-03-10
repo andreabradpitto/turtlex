@@ -9,7 +9,8 @@ from keras.regularizers import l2
 
 
 class ActorNet():
-	""" Actor Network for DDPG
+	"""
+	Actor Network for DDPG
 	"""
 	def __init__(self, in_dim, out_dim, act_range, lr_, tau_):
 		self.obs_dim = in_dim
@@ -30,7 +31,8 @@ class ActorNet():
 
 
 	def create_network(self):
-		""" Create a Actor Network Model using Keras
+		"""
+		Create a Actor Network Model using Keras
 		"""
 		# input layer(observations)
 		input_ = Input(shape=self.obs_dim)
@@ -56,7 +58,8 @@ class ActorNet():
 		return Model(input_, out)
 
 	def train(self, obs, critic, q_grads):
-		""" training Actor's Weights
+		"""
+		Training Actor's Weights
 		"""
 		with tf.GradientTape() as tape:
 			actions = self.network(obs)
@@ -66,7 +69,8 @@ class ActorNet():
 		self.optimizer.apply_gradients(zip(actor_grad,self.network.trainable_variables))
 
 	def target_update(self):
-		""" soft target update for training target actor network
+		"""
+		Soft target update for training target actor network
 		"""
 		weights, weights_t = self.network.get_weights(), self.target_network.get_weights()
 		for i in range(len(weights)):
@@ -74,12 +78,14 @@ class ActorNet():
 		self.target_network.set_weights(weights_t)
 
 	def predict(self, obs):
-		""" predict function for Actor Network
+		"""
+		Predict function for Actor Network
 		"""
 		return self.network.predict(np.expand_dims(obs, axis=0))
 
 	def target_predict(self, new_obs):
-		"""  predict function for Target Actor Network
+		"""
+		Predict function for Target Actor Network
 		"""
 		return self.target_network.predict(new_obs)
 
@@ -94,7 +100,8 @@ class ActorNet():
 
 
 class CriticNet():
-	""" Critic Network for DDPG
+	"""
+	Critic Network for DDPG
 	"""
 	def __init__(self, in_dim, out_dim, lr_, tau_, discount_factor):
 		self.obs_dim = in_dim
@@ -114,8 +121,9 @@ class CriticNet():
 		self.critic_loss = None
 
 	def create_network(self):
-		""" Create a Critic Network Model using Keras
-			as a Q-value approximator function
+		"""
+		Create a Critic Network Model using Keras
+		as a Q-value approximator function
 		"""
 		# input layer(observations and actions)
 		input_obs = Input(shape=self.obs_dim)
@@ -149,7 +157,8 @@ class CriticNet():
 		return tape.gradient(q_values, acts)
 
 	def train(self, obs, acts, target):
-		"""Train Q-network for critic on sampled batch
+		"""
+		Train Q-network for critic on sampled batch
 		"""
 		with tf.GradientTape() as tape:
 			q_values = self.network([obs, acts], training=True)
@@ -162,17 +171,20 @@ class CriticNet():
 		self.optimizer.apply_gradients(zip(critic_grad, self.network.trainable_variables))
 
 	def predict(self, obs):
-		"""Predict Q-value from approximation function(Q-network)
+		"""
+		Predict Q-value from approximation function(Q-network)
 		"""
 		return self.network.predict(obs)
 
 	def target_predict(self, new_obs):
-		"""Predict target Q-value from approximation function(Q-network)
+		"""
+		Predict target Q-value from approximation function(Q-network)
 		"""
 		return self.target_network.predict(new_obs)
 
 	def target_update(self):
-		""" soft target update for training target critic network
+		"""
+		Soft target update for training target critic network
 		"""
 		weights, weights_t = self.network.get_weights(), self.target_network.get_weights()
 		for i in range(len(weights)):

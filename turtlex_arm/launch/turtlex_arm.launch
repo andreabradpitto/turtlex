@@ -101,17 +101,10 @@
     </group>
 
 
-    <!--<rosparam command="load" file="$(find temp)/config/fetch_n1try_params.yaml"/>--> <!-- working -->
-    <!--<rosparam command="load" file="$(find temp)/config/fetch_HER_params.yaml"/>-->
-    <!--<rosparam command="load" file="$(find temp)/config/fetch_HER_params.yaml"/>-->
-    <rosparam command="load" file="$(find turtlex_arm)/config/turtlex_arm_config.yaml"/>
+    <!-- Load the environment parameters file -->
+    <rosparam command="load" file="$(find turtlex_arm)/config/turtlex_arm_ddpg_office.yaml"/>
     <!-- Launch the training system -->
-    <!--<node pkg="temp" name="fetch_moveit_test" type="test_fetch_norio.py" output="screen"/>-->
-    <!--<node pkg="temp" name="train_fetch_her" type="train.py" output="screen"/>-->
-    <!--<node pkg="temp" name="train_fetch_her" type="fetch_HER.py" output="screen"/>-->
-    <!--<node pkg="temp" name="temp_algorithm" type="temp_alg.py" output="screen"/>--> <!-- copia di fetch_n1try.py, per ora -->
     <node pkg="turtlex_arm" name="turtlex_arm_algorithm" type="turtlex_arm_alg.py" output="screen"/>
-
     <!--<node pkg="turtlex_arm" name="turtlex_arm_moveit_test" type="turtlex_arm_moveit_test.py" output="screen"/>-->
 
 </launch>

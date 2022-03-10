@@ -4,7 +4,9 @@ from collections import deque
 
 
 class SumTree:
-    """ A binary tree data structure where the parent’s value is the sum of its children
+    """
+    A binary tree data structure where the parent’s
+    value is the sum of its children
     """
     write = 0
 
@@ -69,11 +71,13 @@ class SumTree:
 
 
 class MemoryBuffer(object):
-    """ Memory Buffer Helper class for Experience Replay
+    """
+    Memory Buffer Helper class for Experience Replay
     using a double-ended queue or a Sum Tree (for PER)
     """
     def __init__(self, buffer_size, with_per = False):
-        """ Initialization
+        """
+        Initialization
         """
         if(with_per):
             # Prioritized Experience Replay(propositional)
@@ -88,7 +92,8 @@ class MemoryBuffer(object):
         self.buffer_size = buffer_size
 
     def memorize(self, state, action, reward, done, new_state, error=None):
-        """ Save an experience to memory, optionally with its TD-Error
+        """
+        Save an experience to memory, optionally with its TD-Error
         """
 
         experience = (state, action, reward, done, new_state)
@@ -106,17 +111,20 @@ class MemoryBuffer(object):
                 self.buffer.append(experience)
 
     def priority(self, error):
-        """ Compute an experience priority, as per Schaul et al.
+        """
+        Compute an experience priority, as per Schaul et al.
         """
         return (error + self.epsilon) ** self.alpha
 
     def size(self):
-        """ Current Buffer Occupation
+        """
+        Current Buffer Occupation
         """
         return self.count
 
     def sample_batch(self, batch_size):
-        """ Sample a batch, optionally with (PER)
+        """
+        Sample a batch, optionally with (PER)
         """
         batch = []
 
@@ -138,13 +146,6 @@ class MemoryBuffer(object):
             batch = random.sample(self.buffer, batch_size)
 
         # Return a batch of experience
-
-        # The 6 ", dtype="object"" are my fixes for "VisibleDeprecationWarning:
-        # Creating an ndarray from ragged nested sequences
-        # (which is a list-or-tuple of lists-or-tuples-or ndarrays with different
-        # lengths or shapes) is deprecated. If you meant to do this,
-        # you must specify 'dtype=object' when creating the ndarray"
-
         s_batch = np.array([i[0] for i in batch], dtype="object")
         a_batch = np.array([i[1] for i in batch], dtype="object")
         r_batch = np.array([i[2] for i in batch], dtype="object")
@@ -153,12 +154,14 @@ class MemoryBuffer(object):
         return s_batch, a_batch, r_batch, d_batch, new_s_batch, idx
 
     def update(self, idx, new_error):
-        """ Update priority for idx (PER)
+        """
+        Update priority for idx (PER)
         """
         self.buffer.update(idx, self.priority(new_error))
 
     def clear(self):
-        """ Clear buffer / Sum Tree
+        """
+        Clear buffer / Sum Tree
         """
         if(self.with_per): self.buffer = SumTree(self.buffer_size)
         else: self.buffer = deque()
@@ -166,7 +169,8 @@ class MemoryBuffer(object):
 
 
 class OrnsteinUhlenbeckProcess(object):
-    """ Ornstein-Uhlenbeck Noise (original code by @slowbull)
+    """
+    Ornstein-Uhlenbeck Noise
     """
     def __init__(self, theta=0.15, mu=0, sigma=0.2, x0=0, dt=1e-2, n_steps_annealing=100, size=1):
         self.theta = theta

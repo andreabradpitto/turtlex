@@ -58,8 +58,8 @@ class ddpgAgent():
     def update_networks(self, obs, acts, critic_target):
         """ Train actor & critic from sampled experience
         """
-        # update critic
-        self.critic.train(obs, acts, critic_target)
+
+        self.critic.train(obs, acts, critic_target)  # Update the critic
 
         # get next action and Q-value Gradient
         n_actions = self.actor.network.predict(obs)
@@ -240,7 +240,7 @@ if __name__ == '__main__':
 
             rospy.loginfo(tcolors.CYAN + "############### Starting Step => " + str(step) + tcolors.ENDC)
 
-            #env.render() # openai_ros does not support render for the moment
+            #env.render()  # openai_ros does not support render for the moment
             action = agent.make_action(state, step)
             next_state, reward, done, _ = env.step(action)
             
@@ -286,4 +286,4 @@ if __name__ == '__main__':
     else:
         agent.save_weights(episode_num)
 
-    env.close() # https://stackoverflow.com/questions/64679139
+    env.close()  # Known issue: https://stackoverflow.com/questions/64679139

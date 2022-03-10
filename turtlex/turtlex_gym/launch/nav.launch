@@ -102,15 +102,10 @@
   <!--<include file="$(find turtlex_description)/launch/xtion_pro_sensor.launch"/>-->
 
 
-  <!-- This version uses the openai_ros environments -->
-  <!--<rosparam command="load" file="$(find turtlex_gym)/config/turtlex_openai_qlearn_params.yaml"/>--> <!-- ok for maze and the one with "start_qlearning.py" -->
-  <!--<rosparam command="load" file="$(find turtlex_gym)/config/turtlex_openai_qlearn_params_wall.yaml"/>--> <!-- wall case -->
-  <rosparam command="load" file="$(find turtlex_gym)/config/turtlex_openai_sac_params_office.yaml"/> <!-- SAC office case -->
+  <!-- Load the environment parameters file -->
+  <rosparam command="load" file="$(find turtlex_gym)/config/turtlex_sac_office.yaml"/>
   <!-- Launch the training system -->
-  <!--<node pkg="turtlex_gym" name="turtlex_maze" type="start_qlearning.py" output="screen"/>--> <!--This is not really optimized for the maze -->
-  <!--<node pkg="turtlex_gym" name="example_turtlex_maze_qlearn" type="my_start_qlearning_maze.py" output="screen"/>--> <!-- versione usata anche in main.launch di gym_construct -->
-  <!--<node pkg="turtlex_gym" name="example_turtlex_wall_qlearn" type="my_start_qlearning_wall.py" output="screen"/>--> <!-- wall case -->
-  <node pkg="turtlex_gym" name="turtlex_sac_office" type="my_sac_office.py" output="screen"/> <!-- SAC office case -->
+  <node pkg="turtlex_gym" name="turtlex_sac_office" type="my_sac_office.py" output="screen"/>
 
 <!--</group>-->
 </launch>

@@ -10,14 +10,13 @@ from openai_ros import robot_gazebo_env
 class TurtlexArmEnv(robot_gazebo_env.RobotGazeboEnv):
 
     def __init__(self):
-        rospy.logdebug("Entered TurltexArmEnv")
+
+        rospy.logdebug("Entered TurltexArmEnv __init__")
         # Variables that we give through the constructor (i.e. the "__init__()""): none in this case
 
-        # Internal Vars
-        # Does not have any accesibles
-        self.controllers_list = []
-        # It does not use namespace
-        self.robot_name_space = ""
+        # Internal variables
+        self.controllers_list = []  # Does not have any accesibles
+        self.robot_name_space = ""  # It does not use namespace
         self.reset_controls = False
 
         # We launch the init function of the Parent Class robot_gazebo_env.RobotGazeboEnv
@@ -40,6 +39,9 @@ class TurtlexArmEnv(robot_gazebo_env.RobotGazeboEnv):
         # Start Services
         self.move_turtlex_arm_object = MoveTurtlexArm()
 
+        rospy.logdebug("Finished TurltexArmEnv __init__")
+
+
     # RobotGazeboEnv virtual methods
     # ----------------------------
 
@@ -48,6 +50,7 @@ class TurtlexArmEnv(robot_gazebo_env.RobotGazeboEnv):
         Checks that all the sensors, publishers and other simulation systems are operational
         """
         self._check_all_sensors_ready()
+
         return True
 
     # TurtlexArmEnv virtual methods
@@ -55,8 +58,9 @@ class TurtlexArmEnv(robot_gazebo_env.RobotGazeboEnv):
 
     def _check_all_sensors_ready(self):
 
+        rospy.logdebug("START _check_all_sensors_ready")
         self._check_joint_states_ready()
-        rospy.logdebug("ALL SENSORS READY")
+        rospy.logdebug("END _check_all_sensors_ready")
 
     def _check_joint_states_ready(self):
         self.joints = None
@@ -211,6 +215,9 @@ class TurtlexArmEnv(robot_gazebo_env.RobotGazeboEnv):
         raise NotImplementedError()
 
     def _get_obs(self):
+        """
+        Acquires the current state/obervation
+        """
         raise NotImplementedError()
 
     def _is_done(self, observations):
@@ -268,7 +275,7 @@ class MoveTurtlexArm(object):
     def execute_trajectory(self): # TODO editata da me, e non so se va
         
         #self.plan = self.group.plan()
-        #result = self.group.go(wait=True) # This executes the planned trajectory (planned via the previous instruction)
+        #result = self.group.go(wait=True)  # This executes the planned trajectory (planned via the previous instruction)
 
         self.plan = self.group.plan()
         #rospy.loginfo("\n\tRISULTATO PLANNING: " + str(plan) + "\n")

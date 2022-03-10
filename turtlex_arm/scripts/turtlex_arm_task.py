@@ -6,11 +6,10 @@ from gym.envs.registration import register
 from geometry_msgs.msg import Point
 from collections import deque
 from utils import tcolors
-import turtlex_arm_env  # task environment
+import turtlex_arm_env  # Robot environment
 
 
-register(
-        id='TurtlexArmTask-v0',
+register(id='TurtlexArmTask-v0',
         entry_point='turtlex_arm_task:TurtlexArmTaskEnv',
         max_episode_steps=10000)
 
@@ -65,7 +64,9 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
 
 
     def get_params(self):
-        # Acquire configuration parameters
+        """
+        Acquire configuration parameters
+        """
 
         self.joints_min_pos = rospy.get_param("/turtlex_arm/joints_min_pos")
         self.joints_max_pos = rospy.get_param("/turtlex_arm/joints_max_pos")
@@ -93,7 +94,7 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
     def _set_init_pose(self):
         """
         Sets the robot in its init pose
-        The Simulation will be unpaused for this purpose
+        The simulation will be unpaused for this purpose
         """
         # Check because it seems it is not being used
         rospy.logdebug("self.init_joint_pos=" + str(self.init_joint_pos))
@@ -136,7 +137,7 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
         """
         rospy.logdebug("Init Env Variables...")
 
-        # Set Done to false, because it is calculated asyncronously
+        # Set episode_done to False, because it is calculated asyncronously
         self.episode_done = False
         self.step_counter = 0
 
@@ -200,7 +201,7 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
         all_joints_pos = self.get_joints().position # TODO questa riga e quella sotto sostituiscono quella sopra: forse questo attenua/risolve il bug che la lista delle joint pos mi veniva da 7 lo stesso, con le 2 pos del gripper in coda
         obs = list(all_joints_pos[2:])
 
-        #new_dist_from_des_pos_ee = self.compute_euclidean_dist(self.desired_position,grip_pos_array)
+        #new_dist_from_des_pos_ee = self.compute_euclidean_dist(self.desired_position, grip_pos_array)
 
         obs.extend([self.desired_ee_goal.x, self.desired_ee_goal.y, self.desired_ee_goal.z])
 
@@ -214,7 +215,6 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
         #return np.asarray(obs)
 
     def _is_done(self, observations):
-        
         """
         If the latest action didn't succeed, it means that the position asked was imposible, therefore the episode must end.
         It will also end if it reaches its goal.
@@ -238,7 +238,8 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
         Punishes differently if it reached a position that is imposible to move to.
         Rewards getting to a position close to the goal.
         """
-        goal_distance_difference =  observations[-1] - self.prev_dist_from_des_pos_ee # observations[-1] contains the current distance, "dist_from_des_pos_ee"
+
+        goal_distance_difference =  observations[-1] - self.prev_dist_from_des_pos_ee # observations[-1] holds the current distance: "dist_from_des_pos_ee"
 
         if not self.episode_done:
 
@@ -289,8 +290,7 @@ class TurtlexArmTaskEnv(turtlex_arm_env.TurtlexArmEnv, utils.EzPickle):
                     if self.goal_to_solve_idx == len(self.goal_x_list):
                             self.goal_to_solve_idx = 0
 
-        # Update the previous distance
-        self.prev_dist_from_des_pos_ee = observations[-1]
+        self.prev_dist_from_des_pos_ee = observations[-1]  # Update the previous distance
         rospy.logdebug("Updated distance from GOAL = " + str(self.prev_dist_from_des_pos_ee))
 
         rospy.logdebug(">>> REWARD >>> " + str(reward))

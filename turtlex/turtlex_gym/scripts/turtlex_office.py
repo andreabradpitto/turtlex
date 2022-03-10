@@ -1,17 +1,16 @@
 import rospy
 import numpy as np
 from gym import spaces
-import turtlex_env
 from gym.envs.registration import register
 from geometry_msgs.msg import Point
 import random
 import math
 from tf.transformations import euler_from_quaternion
 from utils import tcolors
+import turtlex_env  # Robot environment
 
 
-register(
-        id='MyTurtlexOffice-v0',
+register(id='MyTurtlexOffice-v0',
         entry_point='turtlex_office:MyTurtlexOfficeEnv',
         max_episode_steps=10000)
 
@@ -254,7 +253,7 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
 
     def _compute_reward(self, observations, done):
 
-        goal_distance_difference =  observations[-1] - self.previous_distance_from_des_point # observations[-1] contains the current distance
+        goal_distance_difference =  observations[-1] - self.previous_distance_from_des_point  # observations[-1] holds the current goal distance
         self.previous_distance_from_des_point = observations[-1]
 
         if not done:
@@ -322,21 +321,21 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
 
     # Internal TaskEnv Methods
 
-    def compute_sector_averages(self, data, n_sectors) -> list:
+    def compute_sector_averages(self, laser_data, n_sectors) -> list:
         """
         Create n_sectors sectors and compute the average of their laser readings,
         then return those averages as a list
         """
         
-        readings_buffer = []
-        sector_readings_avg = []
-        n_readings_per_sector = len(data.ranges) / n_sectors
+        readings_buffer = []  # Single sector buffer
+        sector_readings_avg = []  # List of the average laser scan values for each sector
+        n_readings_per_sector = len(laser_data.ranges) / n_sectors
         
-        rospy.logdebug("data = " + str(data))
+        rospy.logdebug("laser_data = " + str(laser_data))
         rospy.logdebug("n_sectors = " + str(n_sectors))
         rospy.logdebug("n_readings_per_sector = " + str(n_readings_per_sector))
         
-        for item in data.ranges:
+        for item in laser_data.ranges:
 
             if item == float ('Inf') or np.isinf(item):
                 readings_buffer.append(self.max_laser_value)
@@ -345,13 +344,13 @@ class MyTurtlexOfficeEnv(turtlex_env.TurtlexEnv):
             else:
                 readings_buffer.append(round(item, self.round_value))
                 
-            if (self.min_range > item > 0):
+            if (self.min_range > item):
                 rospy.loginfo(tcolors.MAGENTA + "Object too close >>> item = " + str(item) + " < " + str(self.min_range) + tcolors.ENDC)
                 self.episode_done = True
 
-            if (len(readings_buffer) == n_readings_per_sector):
+            if (len(readings_buffer) == n_readings_per_sector):  # All the laser scans of the sector have been parsed
                 sector_readings_avg.append(sum(readings_buffer) / n_readings_per_sector)
-                readings_buffer = []
+                readings_buffer = []  # Empty the sector buffer
 
         return sector_readings_avg
         
