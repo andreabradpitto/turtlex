@@ -26,6 +26,7 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 - [PyTorch](https://pytorch.org/get-started/locally/)
 - [TensorFlow](https://www.tensorflow.org/install/)
 - [OpenCV](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)
+- [MPI fo Python](https://mpi4py.readthedocs.io/en/stable/install.html) (`python -m pip install mpi4py`)
 
 ## ✅ Installation
 
