@@ -11,8 +11,8 @@ import turtlex_env  # Robot environment
 
 
 register(id='TaskNavOffice-v0',
-        entry_point='task_nav_office:TaskNavOfficeEnv',
-        max_episode_steps=10000)
+         entry_point='task_nav_office:TaskNavOfficeEnv',
+         max_episode_steps=10000)
 
 class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
 

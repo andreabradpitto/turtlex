@@ -230,7 +230,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
     def get_joint_names(self):
         return self.joints.name
 
-    def set_trajectory_ee(self, action):
+    def set_trajectory_ee(self, action):  # Currently unused TODO
         """
         Sets the Pose of the EndEffector based on the action variable.
         The action variable contains the position and orientation of the EndEffector.
@@ -268,7 +268,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         
         return result
         
-    def create_action(self, position, orientation):
+    def create_action(self, position, orientation):  # Currently unused TODO
         """
         position = [x,y,z]
         orientation= [x,y,z,w]
@@ -465,7 +465,7 @@ class MoveTurtlexArm(object):
         #result = self.group.go(wait=True)  # This executes the planned trajectory (planned via the previous instruction)
 
         self.plan = self.group.plan()
-        #rospy.loginfo("\n\tRISULTATO PLANNING: " + str(plan) + "\n")
+        rospy.loginfo("\n\tRISULTATO PLANNING: " + str(self.plan) + "\n")
         if self.plan[0] == True:  # va bene anche, credo (ancor da testare): "if plan[1].points:"" ; o al massimo "if plan[1].joint_trajectory.points:"
             rospy.loginfo("Plan found")
             result = self.group.execute(self.plan[1], wait=True)

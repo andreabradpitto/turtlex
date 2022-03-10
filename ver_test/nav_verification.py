@@ -255,7 +255,7 @@ for net in range(len(net_id)): # Loop for each neural network
             action = agent.select_action(state, eval=True)
 
             unnorm_action = np.array([nav_query.action_unnormalized(action[0], lin_vel_bounds[1], lin_vel_bounds[0]),
-                                    nav_query.action_unnormalized(action[1], ang_vel_bounds[1], ang_vel_bounds[0])])
+                                      nav_query.action_unnormalized(action[1], ang_vel_bounds[1], ang_vel_bounds[0])])
 
             local_output.append(unnorm_action)
 

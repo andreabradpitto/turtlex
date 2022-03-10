@@ -10,8 +10,8 @@ import turtlex_env  # Robot environment
 
 
 register(id='TaskArmOffice-v0',
-        entry_point='task_arm_office:TaskArmOfficeEnv',
-        max_episode_steps=10000)
+         entry_point='task_arm_office:TaskArmOfficeEnv',
+         max_episode_steps=10000)
 
 class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
 
@@ -56,6 +56,10 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         self.overall_steps = 0  # sum of the steps of all the previous and current episodes
         self.score_history = deque(maxlen=self.score_hist_length)
 
+        self.init_joint_pos_list = []
+        for value in self.init_joint_pos.values():
+            self.init_joint_pos_list.append(value)
+
         if not self.is_training:
             self.solved_counter = 0
 
@@ -97,30 +101,16 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         The simulation will be unpaused for this purpose
         """
         # Check because it seems it is not being used
-        rospy.logdebug("self.init_joint_pos=" + str(self.init_joint_pos))
-
-        #self.movement_result = self.set_trajectory_joints(self.init_joint_pos)
-        # Init Joint Pose
         rospy.logdebug("Moving to INIT POSE Position")
+        #rospy.logdebug("self.init_joint_pos=" + str(self.init_joint_pos))
 
-        #action = self.create_action(self.init_joint_pos)
-        #self.movement_result = self.set_trajectory_ee(action)
+        self.action_result = self.move_joints(self.init_joint_pos_list)
 
-        init_joint_pos_list = []
-        for value in self.init_joint_pos.values():
-            init_joint_pos_list.append(value)
-        self.action_result = self.move_joints(init_joint_pos_list)
-
-        # if self.action_result:
-        #     self.joints_pos = copy.deepcopy(self.action_result)
-        # else:
-        #     #assert False, "Desired INIT POSE is not possible"
-        #     print("Desired INIT POSE is not possible")
-
-        # TODO
-        if not self.action_result:
-        #    assert False, "Desired INIT POSE is not possible"
-            print("Desired INIT POSE is not possible")
+        if self.action_result:
+            self.joints_pos = list(self.get_joints().position[2:])
+        else:
+            #print("Desired INIT POSE is not possible")
+            assert False, "Desired INIT POSE is not possible"
         
         rospy.logdebug("Init Pose Results ==> " + str(self.action_result))
 
@@ -137,8 +127,7 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         """
         rospy.logdebug("Init Env Variables...")
 
-        # Set episode_done to False, because it is calculated asyncronously
-        self.episode_done = False
+        self.episode_done = False  # Set episode_done to False, because it is computed asyncronously
         self.step_counter = 0
 
         self.desired_ee_goal.x = self.goal_ee_pos["x"][self.goal_to_solve_idx]
@@ -149,7 +138,6 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         rospy.logdebug("desired_ee_goal.y: " + str(self.desired_ee_goal.y))
         rospy.logdebug("desired_ee_goal.z: " + str(self.desired_ee_goal.z))
 
-        #self.gripper_position = self.move_turtlex_arm_object.ee_pose().position
         self.gripper_position = self.get_ee_pose().position
         self.prev_dist_from_des_pos_ee = self.compute_euclidean_dist(self.desired_ee_goal, self.gripper_position)
         self.prev_dist_from_des_pos_ee = round(self.prev_dist_from_des_pos_ee, self.round_value)
@@ -164,16 +152,17 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
 
         self.action_result = self.move_joints(action)
 
-        # Apply action to the simulation
+        # These are for actions that move the end effectors, not the joint. Should also be used in _set_init_pose()
         #action_end_effector = self.create_action(gripper_target, self.gripper_rotation)
         #self.movement_result = self.set_trajectory_ee(action_end_effector)
 
-        # If the joints configuration was successful, we replace the last one with the new one
-        #if self.action_result:
-        #    self.joints_pos = copy.deepcopy(self.action_result)
-        #else:
-            #rospy.loginfo(tcolors.MAGENTA + "Impossible joints configuration from action: " + str(action) + tcolors.ENDC)
-            #self.episode_done = True # questo va bene qui ma cerco di mettere tutto in _is_done()
+        # Apply action to the simulation
+        if self.action_result:
+            # If the joints configuration was successful, we replace the last one with the new one
+            self.joints_pos = list(self.get_joints().position[2:])
+        else:
+            rospy.loginfo(tcolors.MAGENTA + "Impossible joints configuration from action: " + str(action) + tcolors.ENDC)
+            self.episode_done = True # questo va bene qui ma cerco di mettere tutto in _is_done()
         
         rospy.loginfo(tcolors.CYAN + "END Set Action ==> " + str(action) + tcolors.ENDC)
 
@@ -186,22 +175,11 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
 
         rospy.logdebug("Start Get Observation ==>")
 
-        #grip_pos = self.get_ee_pose().position
-        #grip_pos_array = [grip_pos.pose.position.x, grip_pos.pose.position.y, grip_pos.pose.position.z]
-        #obs = grip_pos_array
-
-        #self.gripper_position = self.move_turtlex_arm_object.ee_pose().position
         self.gripper_position = self.get_ee_pose().position
         dist_from_des_pos_ee = self.compute_euclidean_dist(self.desired_ee_goal, self.gripper_position)
         dist_from_des_pos_ee = round(dist_from_des_pos_ee, self.round_value)
 
-        #obs = [self.gripper_position.x, self.gripper_position.y, self.gripper_position.z] # TODO anche questo può avere senso: in caso cambia numero obs in parametri .yaml da 9 a 7
-        #obs = self.joints_pos # TODO ricontrolla soluzione alternativa a joints_pos
-        #obs = list(self.get_joints().position[2:]) # skip the position of the two gripper prismatic joints
-        all_joints_pos = self.get_joints().position # TODO questa riga e quella sotto sostituiscono quella sopra: forse questo attenua/risolve il bug che la lista delle joint pos mi veniva da 7 lo stesso, con le 2 pos del gripper in coda
-        obs = list(all_joints_pos[2:])
-
-        #new_dist_from_des_pos_ee = self.compute_euclidean_dist(self.desired_position, grip_pos_array)
+        obs = list(self.get_joints().position[2:])  # skip the position of the two gripper prismatic joints
 
         obs.extend([self.desired_ee_goal.x, self.desired_ee_goal.y, self.desired_ee_goal.z])
 
@@ -239,7 +217,10 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         Rewards getting to a position close to the goal.
         """
 
-        goal_distance_difference =  observations[-1] - self.prev_dist_from_des_pos_ee # observations[-1] holds the current distance: "dist_from_des_pos_ee"
+        goal_distance_difference =  observations[-1] - self.prev_dist_from_des_pos_ee  # observations[-1] holds the current distance: "dist_from_des_pos_ee"
+
+        self.prev_dist_from_des_pos_ee = observations[-1]  # Update the previous distance from goal
+        rospy.logdebug("Updated distance from GOAL = " + str(self.prev_dist_from_des_pos_ee))
 
         if not self.episode_done:
 
@@ -289,9 +270,6 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
                     self.goal_to_solve_idx += 1
                     if self.goal_to_solve_idx == len(self.goal_x_list):
                             self.goal_to_solve_idx = 0
-
-        self.prev_dist_from_des_pos_ee = observations[-1]  # Update the previous distance
-        rospy.logdebug("Updated distance from GOAL = " + str(self.prev_dist_from_des_pos_ee))
 
         rospy.logdebug(">>> REWARD >>> " + str(reward))
         
