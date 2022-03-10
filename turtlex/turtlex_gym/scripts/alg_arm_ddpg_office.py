@@ -189,7 +189,7 @@ if __name__ == '__main__':
 
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path(rospackage_name)
-    outdir = pkg_path + '/training_results/' + world_name + '_arm_ddpg'
+    outdir = pkg_path + '/results/' + world_name + '_arm_ddpg'
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)

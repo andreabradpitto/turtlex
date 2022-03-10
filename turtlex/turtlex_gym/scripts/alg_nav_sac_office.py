@@ -290,7 +290,7 @@ if __name__ == '__main__':
     # Set the logging system
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path('turtlex_gym')
-    outdir = pkg_path + '/training_results/' + world_name + '_nav_sac'
+    outdir = pkg_path + '/results/' + world_name + '_nav_sac'
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)

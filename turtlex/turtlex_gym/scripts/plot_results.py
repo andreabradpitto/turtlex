@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path('turtlex_gym')
-    outdir = pkg_path + '/training_results/' + user_input
+    outdir = pkg_path + '/results/' + user_input
     plotter = LivePlot(outdir)
 
     parser = argparse.ArgumentParser()
