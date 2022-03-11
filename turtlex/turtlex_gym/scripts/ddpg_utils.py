@@ -16,7 +16,7 @@ class SumTree:
         self.data = np.zeros(capacity, dtype=object)
         self.n_entries = 0
 
-    # update to the root node
+    # Update to the root node
     def _propagate(self, idx, change):
         parent = (idx - 1) // 2
 
@@ -25,7 +25,7 @@ class SumTree:
         if parent != 0:
             self._propagate(parent, change)
 
-    # find sample on leaf node
+    # Find sample on leaf node
     def _retrieve(self, idx, s):
         left = 2 * idx + 1
         right = left + 1
@@ -41,7 +41,7 @@ class SumTree:
     def total(self):
         return self.tree[0]
 
-    # store priority and sample
+    # Store priority and sample
     def add(self, p, data):
         idx = self.write + self.capacity - 1
 
@@ -55,14 +55,14 @@ class SumTree:
         if self.n_entries < self.capacity:
             self.n_entries += 1
 
-    # update priority
+    # Update priority
     def update(self, idx, p):
         change = p - self.tree[idx]
 
         self.tree[idx] = p
         self._propagate(idx, change)
 
-    # get priority and sample
+    # Get priority and sample
     def get(self, s):
         idx = self._retrieve(0, s)
         dataIdx = idx - self.capacity + 1
@@ -80,7 +80,7 @@ class MemoryBuffer(object):
         Initialization
         """
         if(with_per):
-            # Prioritized Experience Replay(propositional)
+            # Prioritized Experience Replay (propositional)
             self.alpha = 0.5
             self.epsilon = 0.01
             self.buffer = SumTree(buffer_size)

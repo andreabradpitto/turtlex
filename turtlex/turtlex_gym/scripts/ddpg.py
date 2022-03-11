@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-
 from keras.initializers import GlorotNormal
 from keras.models import Model
 from keras.optimizers import Adam
@@ -18,14 +17,14 @@ class ActorNet():
 		self.act_range = act_range
 		self.lr = lr_; self.tau = tau_
 
-		# initialize actor network and target
+		# Initialize actor network and target
 		self.network = self.create_network()
 		self.target_network = self.create_network()
 
-		# initialize optimizer
+		# Initialize optimizer
 		self.optimizer = Adam(self.lr)
 
-		# copy the weights for initialization
+		# Copy the weights for initialization
 		weights_ = self.network.get_weights()
 		self.target_network.set_weights(weights_)
 
@@ -34,20 +33,20 @@ class ActorNet():
 		"""
 		Create a Actor Network Model using Keras
 		"""
-		# input layer(observations)
+		# Unput layer (observations)
 		input_ = Input(shape=self.obs_dim)
 
-		# hidden layer 1
+		# Gidden layer 1
 		h1_ = Dense(30, kernel_initializer=GlorotNormal())(input_)
 		h1_b = BatchNormalization()(h1_)
 		h1 = Activation('relu')(h1_b)
 
-		# hidden_layer 2
+		# Hidden_layer 2
 		h2_ = Dense(30, kernel_initializer=GlorotNormal())(h1)
 		h2_b = BatchNormalization()(h2_)
 		h2 = Activation('relu')(h2_b)
 
-		# output layer(actions)
+		# Output layer (actions)
 		output_ = Dense(self.act_dim, kernel_initializer=GlorotNormal())(h2)
 		output_b = BatchNormalization()(output_)
 		output = Activation('sigmoid')(2 * output_b)
@@ -63,8 +62,7 @@ class ActorNet():
 		"""
 		with tf.GradientTape() as tape:
 			actions = self.network(obs)
-			actor_loss = -tf.reduce_mean(critic([obs,actions]))
-			# actor_grad = tape.gradient(self.network(obs), self.network.trainable_variables,-q_grads)
+			actor_loss = - tf.reduce_mean(critic([obs,actions]))
 		actor_grad = tape.gradient(actor_loss,self.network.trainable_variables)
 		self.optimizer.apply_gradients(zip(actor_grad,self.network.trainable_variables))
 
@@ -108,13 +106,13 @@ class CriticNet():
 		self.act_dim = out_dim
 		self.lr = lr_; self.discount_factor=discount_factor;self.tau = tau_
 
-		# initialize critic network and target
+		# Initialize critic network and target
 		self.network = self.create_network()
 		self.target_network = self.create_network()
 
 		self.optimizer = Adam(self.lr)
 
-		# copy the weights for initialization
+		# Copy the weights for initialization
 		weights_ = self.network.get_weights()
 		self.target_network.set_weights(weights_)
 
@@ -125,23 +123,23 @@ class CriticNet():
 		Create a Critic Network Model using Keras
 		as a Q-value approximator function
 		"""
-		# input layer(observations and actions)
+		# Input layer (observations and actions)
 		input_obs = Input(shape=self.obs_dim)
 		input_act = Input(shape=(self.act_dim,))
 		inputs = [input_obs, input_act]
 		concat = Concatenate(axis=-1)(inputs)
 
-		# hidden layer 1
+		# Hidden layer 1
 		h1_ = Dense(300, kernel_initializer=GlorotNormal(), kernel_regularizer=l2(0.01))(concat)
 		h1_b = BatchNormalization()(h1_)
 		h1 = Activation('relu')(h1_b)
 
-		# hidden_layer 2
+		# Hidden_layer 2
 		h2_ = Dense(400, kernel_initializer=GlorotNormal(), kernel_regularizer=l2(0.01))(h1)
 		h2_b = BatchNormalization()(h2_)
 		h2 = Activation('relu')(h2_b)
 
-		# output layer(actions)
+		# Output layer (actions)
 		output_ = Dense(1, kernel_initializer=GlorotNormal(), kernel_regularizer=l2(0.01))(h2)
 		output_b = BatchNormalization()(output_)
 		output = Activation('linear')(output_b)
@@ -167,7 +165,7 @@ class CriticNet():
 			tf.print("critic loss :",critic_loss)
 			self.critic_loss = float(critic_loss)
 
-		critic_grad = tape.gradient(critic_loss, self.network.trainable_variables)  # compute critic gradient
+		critic_grad = tape.gradient(critic_loss, self.network.trainable_variables)  # Compute critic gradient
 		self.optimizer.apply_gradients(zip(critic_grad, self.network.trainable_variables))
 
 	def predict(self, obs):
