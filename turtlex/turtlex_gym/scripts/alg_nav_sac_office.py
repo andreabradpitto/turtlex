@@ -239,7 +239,7 @@ class SAC(object):
 
 if __name__ == '__main__':
 
-    rospy.init_node('turtlex_sac_office', anonymous=True, log_level=rospy.INFO)  # change from rospy.WARN to rospy.DEBUG to view all the prints
+    rospy.init_node('turtlex_sac_office', anonymous=True, log_level=rospy.INFO)
     # logging hierarchy: CRITICAL > ERROR > WARNING > INFO > DEBUG; the chosen log level outputs that level and all the ones above it
 
     while('/spawn_turtlex_model' in rosnode.get_node_names()):
@@ -343,7 +343,7 @@ if __name__ == '__main__':
 
             rospy.loginfo(tcolors.CYAN + "############### Starting Step => " + str(step) + tcolors.ENDC)
 
-            state = np.float32(state) # attento qui, sotto, unnorm_action, ed a return np.asarray(observations) in _get_obs() + 2 in _init_env_variables
+            state = np.float32(state)
 
             #env.render()  # openai_ros does not support render for the moment
 
@@ -357,7 +357,6 @@ if __name__ == '__main__':
 
             # De-normalize the action, so that env.step() gets passed the actual linear and angular velocities
             # Normalization was performed in [-1, 1]
-            #unnorm_action = [action_unnormalized(action[0], action_v_max, action_v_min), action_unnormalized(action[1], action_w_max, action_w_min)]
             unnorm_action = np.array([action_unnormalized(action[0], action_v_max, action_v_min),
                                       action_unnormalized(action[1], action_w_max, action_w_min)])
 
@@ -366,7 +365,7 @@ if __name__ == '__main__':
             if highest_reward < env.overall_reward:
                 highest_reward = env.overall_reward
 
-            next_state = np.float32(next_state) # attento qui, sopra, unnorm_action, ed a return np.asarray(observations) in _get_obs() + 2 in _init_env_variables
+            next_state = np.float32(next_state)
 
             #rospy.loginfo(tcolors.CYAN + "# State used for the action       => [" + str(', '.join(map(str, state))) + "]" + tcolors.ENDC)
             ##rospy.loginfo(tcolors.CYAN + "# Action performed (normalized)   => [" + str(', '.join(map(str, action))) + "]" + tcolors.ENDC)

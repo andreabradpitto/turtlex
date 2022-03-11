@@ -102,17 +102,18 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         """
         # Check because it seems it is not being used
         rospy.logdebug("Moving to INIT POSE Position")
-        #rospy.logdebug("self.init_joint_pos=" + str(self.init_joint_pos))
+        rospy.logdebug("self.init_joint_pos=" + str(self.init_joint_pos))
 
         self.action_result = self.move_joints(self.init_joint_pos_list)
 
         if self.action_result:
             self.joints_pos = list(self.get_joints().position[2:])
         else:
-            #print("Desired INIT POSE is not possible")
+            rospy.logerr("Desired INIT POSE is not possible")
             assert False, "Desired INIT POSE is not possible"
         
-        rospy.logdebug("Init Pose Results ==> " + str(self.action_result))
+        rospy.logdebug("Init Pose result ==> " + str(self.action_result))
+        if self.action_result: rospy.logdebug("Init Pose reached ==> " + str(self.joints_pos))
 
         return self.action_result
 
@@ -150,7 +151,7 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         
         self.step_counter += 1
 
-        self.action_result = self.move_joints(action)
+        self.action_result = self.move_joints(self.joints_pos)
 
         # These are for actions that move the end effectors, not the joint. Should also be used in _set_init_pose()
         #action_end_effector = self.create_action(gripper_target, self.gripper_rotation)
@@ -186,11 +187,9 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         obs.append(dist_from_des_pos_ee)
 
         rospy.logdebug("Observations ==> " + str(obs))
-        #rospy.logdebug("Observations ==> " + str(np.asarray(obs)))
         rospy.logdebug("END Get Observation ==>")
 
         return obs
-        #return np.asarray(obs)
 
     def _is_done(self, observations):
         """

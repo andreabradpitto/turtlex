@@ -180,8 +180,6 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
         self.odometry = self.get_odom()
         self.previous_distance_from_des_point = self.get_distance_from_point(self.odometry.pose.pose.position, self.desired_point)
         self.previous_distance_from_des_point = round(self.previous_distance_from_des_point, self.round_value)
-        #self.previous_action = [0.,0.]
-        #self.current_action = [0.,0.]
         self.previous_action = np.array([0.,0.])
         self.current_action = np.array([0.,0.])
 
@@ -230,12 +228,10 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
 
         observations = discretized_laser_scan + [round(heading, self.round_value), round(goal_distance, self.round_value)]
 
-        #rospy.logdebug("Observations ==> " + str(observations))
         rospy.logdebug("Observations ==> " + str(np.asarray(observations)))
         rospy.logdebug("END Get Observation ==>")
 
-        #return observations
-        return np.asarray(observations) #TODO attento a questa conversione np.asarray + 2 float32() in altro file! + in _init_env_variables qui
+        return np.asarray(observations)
         
 
     def _is_done(self, observations):

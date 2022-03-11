@@ -230,7 +230,7 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
     def get_joint_names(self):
         return self.joints.name
 
-    def set_trajectory_ee(self, action):  # Currently unused TODO
+    def set_trajectory_ee(self, action):  # Currently unused
         """
         Sets the Pose of the EndEffector based on the action variable.
         The action variable contains the position and orientation of the EndEffector.
@@ -249,26 +249,17 @@ class TurtlexEnv(robot_gazebo_env.RobotGazeboEnv):
         
         return result
         
-    def set_trajectory_joints(self, initial_qpos): # TODO editata da me 
-
-        #positions_array = [None] * 5
-        #positions_array[0] = initial_qpos["joint_1"]
-        #positions_array[1] = initial_qpos["joint_2"]
-        #positions_array[2] = initial_qpos["joint_3"]
-        #positions_array[3] = initial_qpos["joint_4"]
-        #positions_array[4] = initial_qpos["joint_5"]
+    def set_trajectory_joints(self, joints_dictionary):
 
         positions_array = []
-        #for idx, elem in enumerate(self.joint_names):
-        #    positions_array.append(initial_qpos[self.joint_names[idx]])
         for elem in self.joint_names:
-            positions_array.append(initial_qpos[elem])
+            positions_array.append(joints_dictionary[elem])
 
         result = self.move_turtlex_arm_object.joint_traj(positions_array)
         
         return result
         
-    def create_action(self, position, orientation):  # Currently unused TODO
+    def create_action(self, position, orientation):  # Currently unused
         """
         position = [x,y,z]
         orientation= [x,y,z,w]
@@ -437,7 +428,7 @@ class MoveTurtlexArm(object):
 
     def ee_traj(self, pose):
         
-        self.group.set_pose_target(pose) # TODO self.group.set_named_target("NOME") per usare le configurazioni mie       
+        self.group.set_pose_target(pose)  # self.group.set_named_target("YOUR_POSE_NAME") in order to use user-defined configurations     
         result = self.execute_trajectory()
         
         return result
@@ -459,21 +450,17 @@ class MoveTurtlexArm(object):
         
         return result
         
-    def execute_trajectory(self): # TODO editata da me, e non so se va
-        
-        #self.plan = self.group.plan()
-        #result = self.group.go(wait=True)  # This executes the planned trajectory (planned via the previous instruction)
+    def execute_trajectory(self):
 
         self.plan = self.group.plan()
-        rospy.logwarn("\n\tRISULTATO PLANNING: " + str(self.plan) + "\n")
+        rospy.logdebug("self.plan:\n" + str(self.plan))
         if self.plan[0] == True:
             rospy.loginfo("Plan found")
-            result = self.group.execute(self.plan[1], wait=True)
+            self.group.execute(self.plan[1], wait=True)  # Equal to self.group.go(wait=True)
+            return True
         else:
-            result = False
             rospy.logerr("Trajectory is empty. Planning was unsuccessful.")
-        
-        return result
+            return False
 
     def ee_pose(self):
         
