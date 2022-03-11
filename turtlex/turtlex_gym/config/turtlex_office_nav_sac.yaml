@@ -19,7 +19,7 @@ turtlex_nav: # namespace
     nepisodes: 10000
     nsteps: 600
 
-    running_step: 0.2  # TODO era 0.06, ma mi sa che non veniva usato... # Time for each step (amount of time in which the control will be executed)
+    running_step: 0.2  # Time for each step (amount of time in which the control will be executed)
 
     monitor: True  # Dedice whether to start the Gym Monitor wrapper or not
 
@@ -49,7 +49,7 @@ turtlex_nav: # namespace
     action_w_min: -2.  # rad/s
     action_w_max: 2.  # rad/s
     
-    min_range: 0.25  # Minimum meters below wich we consider we have crashed; 2x max robot reach = ~0.33 x 2 ~= 0.6 ? # TODO i mobili più profondi sono 0.6, gli altri 0.5
+    min_range: 0.25  # Minimum meters below wich we consider we have crashed
 
     n_sectors: 10  # number of sectors for the state. As the laser sensor is composed by 720 rays: only input values that are its divisor
     n_actions: 2  # linear and angular velocities

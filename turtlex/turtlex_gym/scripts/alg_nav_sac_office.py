@@ -377,7 +377,6 @@ if __name__ == '__main__':
 
             if not ep % 10 == 0 or not len(replay_buffer) > before_training * batch_size:
                 if reward == goal_reached_reward:
-                    rospy.loginfo(tcolors.MAGENTA + '\n\n\n\n\t\t\t-------- GOAL REACHED ----------\n\n\n' + tcolors.ENDC)
                     for _ in range(3):
                         replay_buffer.push(state, action, reward, next_state, done)
                 else:
