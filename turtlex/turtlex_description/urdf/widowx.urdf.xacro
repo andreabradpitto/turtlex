@@ -5,14 +5,9 @@
    
    <xacro:include filename="$(find turtlex_description)/urdf/widowx_gazebo.urdf.xacro"/>
 
-   <!--link name="plate_top_link"/-->
-   <!--joint name="fixed" type="fixed">
-      <parent link="plate_top_link" />
-      <child link="ph_base_link" />
-   </joint-->
-
    <xacro:macro name="widowx_arm" params="parent *origin">
-      <!-- links -->
+
+      <!-- Links -->
       <link name="arm_base_link">
          <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
@@ -57,14 +52,14 @@
          <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-               <mesh filename="package://turtlex_description/meshes/arm/biceps_link.new.stl" />
+               <mesh filename="package://turtlex_description/meshes/arm/biceps_link.stl" />
             </geometry>
             <xacro:material_black />
          </visual>
          <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-               <mesh filename="package://turtlex_description/meshes/arm/biceps_link.new.stl" />
+               <mesh filename="package://turtlex_description/meshes/arm/biceps_link.stl" />
             </geometry>
          </collision>
          <inertial>
@@ -77,14 +72,14 @@
          <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-               <mesh filename="package://turtlex_description/meshes/arm/forearm_link.new.stl"/>
+               <mesh filename="package://turtlex_description/meshes/arm/forearm_link.stl"/>
             </geometry>
            <xacro:material_black />
          </visual>
          <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-               <mesh filename="package://turtlex_description/meshes/arm/forearm_link.new.stl"/>
+               <mesh filename="package://turtlex_description/meshes/arm/forearm_link.stl"/>
             </geometry>
          </collision>
          <inertial>
@@ -117,14 +112,14 @@
          <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-               <mesh filename="package://turtlex_description/meshes/arm/wrist_2_link.new.stl"/>
+               <mesh filename="package://turtlex_description/meshes/arm/wrist_2_link.stl"/>
             </geometry>
             <xacro:material_black />
          </visual>
          <collision>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-               <mesh filename="package://turtlex_description/meshes/arm/wrist_2_link.new.stl"/>
+               <mesh filename="package://turtlex_description/meshes/arm/wrist_2_link.stl"/>
             </geometry>
          </collision>
          <inertial>
@@ -134,7 +129,7 @@
          </inertial>
       </link>
 
-      <!-- joints -->
+      <!-- Joints -->
       <joint name="arm_base_joint" type="fixed">
          <xacro:insert_block name="origin" />
          <parent link="${parent}" />
@@ -260,15 +255,10 @@
          <origin xyz="0 0 0" rpy="0 0 0" />
          <parent link="gripper_rail_link" />
          <child link="gripper_2_link" />
-         <!--<mimic joint="gripper_prismatic_joint_1" multiplier="-1" offset="0"/>-->
          <axis xyz="0 1 0" />
          <limit lower="0.002" upper="0.031" effort="50" velocity="0.5" />
          <dynamics friction="0.1"/>
       </joint>
-
-      <!--<xacro:mimic_joint_plugin_gazebo name_prefix="gripper_prismatic_joint_2"
-      parent_joint="gripper_prismatic_joint_1" mimic_joint="gripper_prismatic_joint_2"
-      has_pid="true" multiplier="-1.0" max_effort="6" />-->
 
    </xacro:macro>
 
@@ -325,7 +315,6 @@
  <transmission name="tran6">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="gripper_prismatic_joint_1">
-    <!--<joint name="gripper_joint">-->
       <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="motor6">

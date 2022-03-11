@@ -16,4 +16,10 @@
   <run_depend>robot_pose_ekf</run_depend>
   <run_depend>robot_state_publisher</run_depend>
   <run_depend>xacro</run_depend>
+
+  <export> <!-- This is needed in order to let Gazebo find the dropbox .dae model -->
+      <gazebo_ros gazebo_model_path="${prefix}/models"/>
+      <gazebo_ros gazebo_media_path="${prefix}/models"/>
+  </export>
+
 </package>

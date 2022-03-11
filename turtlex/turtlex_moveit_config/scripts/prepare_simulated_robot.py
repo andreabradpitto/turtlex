@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
 
+import sys
 import rospy
 import actionlib
 from control_msgs.msg import (FollowJointTrajectoryAction,
@@ -11,8 +11,9 @@ from control_msgs.msg import (FollowJointTrajectoryAction,
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 arm_joint_names = ["joint_1, joint_2, joint_3, joint_4, joint_5"]
-arm_intermediate_positions  = [0.0, 0.9575, -0.2510, 0.8364, 0.0] # picking_arm
-arm_joint_positions  = [0.0, -1.0, 1.0, 1.2, 0.0] # rest_arm
+arm_intermediate_positions  = [0.0, 0.9575, -0.2510, 0.8364, 0.0]  # picking_arm
+arm_joint_positions  = [0.0, -1.0, 1.0, 1.2, 0.0]  # rest_arm
+
 
 if __name__ == "__main__":
 

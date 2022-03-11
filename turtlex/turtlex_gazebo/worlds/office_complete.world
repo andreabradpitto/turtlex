@@ -21,7 +21,7 @@
       <real_time_factor>1</real_time_factor>
       <max_contacts>20</max_contacts>
     </physics>
-    <light name='sun' type='directional'>
+    <light name='office_sun' type='directional'>
       <cast_shadows>1</cast_shadows>
       <pose>0 0 10 0 -0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -39,7 +39,7 @@
         <falloff>0</falloff>
       </spot>
     </light>
-    <model name='ground_plane'>
+    <model name='office_ground_plane'>
       <static>1</static>
       <link name='link'>
         <collision name='collision'>
@@ -4177,7 +4177,7 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
-      <model name='ground_plane'>
+      <model name='office_ground_plane'>
         <pose>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
@@ -4317,7 +4317,7 @@
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
-      <light name='sun'>
+      <light name='office_sun'>
         <pose>0 0 10 0 -0 0</pose>
       </light>
     </state>
@@ -5100,8 +5100,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <!--<uri>model://dropbox/meshes/dropbox.dae</uri>-->
-              <uri>/home/andrea/catkin_ws/src/turtlex/turtlex_gazebo/models/dropbox/meshes/dropbox.dae</uri>
+              <uri>model://dropbox.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -5125,8 +5124,7 @@
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <mesh>
-              <!--<uri>model://dropbox/meshes/dropbox.dae</uri>-->
-              <uri>/home/andrea/catkin_ws/src/turtlex/turtlex_gazebo/models/dropbox/meshes/dropbox.dae</uri>
+              <uri>model://dropbox.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>

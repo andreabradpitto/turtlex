@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- questo forse e legato alla telecamera reale, mi sa che non serve -->
-
 <!-- 
   Turtlebot is a bit low on horsepower...
 
@@ -45,21 +43,6 @@
   <!-- Laserscan topic -->
   <arg name="scan_topic" default="scan"/>
 
-  <!--
-  <include file="$(find turtlebot_bringup)/launch/includes/3dsensor/$(arg 3d_sensor).launch.xml">
-    <arg name="camera"                          value="$(arg camera)"/>
-    <arg name="publish_tf"                      value="$(arg publish_tf)"/>
-    <arg name="depth_registration"              value="$(arg depth_registration)"/>
-    <arg name="num_worker_threads"              value="$(arg num_worker_threads)" />
-
-    <arg name="rgb_processing"                  value="$(arg rgb_processing)"/>
-    <arg name="ir_processing"                   value="$(arg ir_processing)"/>
-    <arg name="depth_processing"                value="$(arg depth_processing)"/>
-    <arg name="depth_registered_processing"     value="$(arg depth_registered_processing)"/>
-    <arg name="disparity_processing"            value="$(arg disparity_processing)"/>
-    <arg name="disparity_registered_processing" value="$(arg disparity_registered_processing)"/>
-  </include>
-  -->
 
   <include file="$(find openni2_launch)/launch/openni2.launch">
     <arg name="camera"                          value="$(arg camera)"/>                             

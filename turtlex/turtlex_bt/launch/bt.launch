@@ -10,8 +10,8 @@
   <arg name="debug"             default="false"/>
   <arg name="verbose"           default="true"/>
   <arg name="use_rviz"          default="false"/>
-  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/my_office.world"/>-->
-  <arg name="world_name"        value="$(find turtlex_gazebo)/worlds/my_office_complete.world"/>
+  <!--<arg name="world_name"        value="$(find turtlex_gazebo)/worlds/office.world"/>-->
+  <arg name="world_name"        value="$(find turtlex_gazebo)/worlds/office_complete.world"/>
 
   <arg name="initial_robot_position" doc="Initial robot position of the robot"
         default=" -x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0"/>

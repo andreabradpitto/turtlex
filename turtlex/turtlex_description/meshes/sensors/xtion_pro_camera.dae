@@ -6,7 +6,7 @@
       <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.4.1;  Revision: exported;  Platform: x64;  Configuration: Release_Max2011_static</authoring_tool>
     </contributor>
     <created>2015-02-26T12:05:50</created>
-    <modified>2015-02-26T12:05:50</modified>
+    <modified>2022-03-11T11:38:01</modified>
     <unit name="millimeter" meter="0.001"/>
     <up_axis>Z_UP</up_axis>
   </asset>

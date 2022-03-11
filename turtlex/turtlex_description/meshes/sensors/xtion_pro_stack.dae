@@ -7,7 +7,7 @@
       <source_data>xtion_pro_stack.max</source_data>
     </contributor>
     <created>2015-03-16T14:25:40</created>
-    <modified>2015-03-16T14:25:40</modified>
+    <modified>2022-03-11T11:38:01</modified>
     <unit name="millimeter" meter="0.001"/>
     <up_axis>Z_UP</up_axis>
   </asset>

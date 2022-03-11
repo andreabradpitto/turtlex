@@ -7,7 +7,7 @@
       <source_data>file:///E:/Windows/Documents/3dsMax/scenes/KOBUKI_MAIN_BODY_URDF.max</source_data>
     </contributor>
     <created>2013-02-26T14:46:10</created>
-    <modified>2013-02-26T14:46:10</modified>
+    <modified>2022-03-11T11:38:01</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>

@@ -16,4 +16,3 @@ install(DIRECTORY meshes
 install(DIRECTORY urdf
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-
