@@ -74,43 +74,43 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
         Acquire configuration parameters
         """
 
-        self.is_training = rospy.get_param("/turtlex/training")
-        self.testing_goals = rospy.get_param("/turtlex/testing_goals")
+        self.is_training = rospy.get_param("/turtlex_nav/training")
+        self.testing_goals = rospy.get_param("/turtlex_nav/testing_goals")
 
-        self.action_v_min = rospy.get_param("/turtlex/action_v_min")
-        self.action_w_min = rospy.get_param("/turtlex/action_w_min")
-        self.action_v_max = rospy.get_param("/turtlex/action_v_max")
-        self.action_w_max = rospy.get_param("/turtlex/action_w_max")
+        self.action_v_min = rospy.get_param("/turtlex_nav/action_v_min")
+        self.action_w_min = rospy.get_param("/turtlex_nav/action_w_min")
+        self.action_v_max = rospy.get_param("/turtlex_nav/action_v_max")
+        self.action_w_max = rospy.get_param("/turtlex_nav/action_w_max")
 
         # Actions and Observations
-        self.init_linear_forward_speed = rospy.get_param('/turtlex/init_linear_forward_speed')
-        self.init_linear_turn_speed = rospy.get_param('/turtlex/init_linear_turn_speed')
+        self.init_linear_forward_speed = rospy.get_param('/turtlex_nav/init_linear_forward_speed')
+        self.init_linear_turn_speed = rospy.get_param('/turtlex_nav/init_linear_turn_speed')
 
-        self.min_range = rospy.get_param('/turtlex/min_range')
+        self.min_range = rospy.get_param('/turtlex_nav/min_range')
 
-        self.world_x_max = rospy.get_param("/turtlex/world_bounds/x_max")
-        self.world_x_min = rospy.get_param("/turtlex/world_bounds/x_min")
-        self.world_y_max = rospy.get_param("/turtlex/world_bounds/y_max")
-        self.world_y_min = rospy.get_param("/turtlex/world_bounds/y_min")
+        self.world_x_max = rospy.get_param("/turtlex_nav/world_bounds/x_max")
+        self.world_x_min = rospy.get_param("/turtlex_nav/world_bounds/x_min")
+        self.world_y_max = rospy.get_param("/turtlex_nav/world_bounds/y_max")
+        self.world_y_min = rospy.get_param("/turtlex_nav/world_bounds/y_min")
 
-        self.goal_x_list = rospy.get_param("/turtlex/desired_pose/x")
-        self.goal_y_list = rospy.get_param("/turtlex/desired_pose/y")
+        self.goal_x_list = rospy.get_param("/turtlex_nav/desired_pose/x")
+        self.goal_y_list = rospy.get_param("/turtlex_nav/desired_pose/y")
 
-        self.n_sectors = rospy.get_param("/turtlex/n_sectors")
+        self.n_sectors = rospy.get_param("/turtlex_nav/n_sectors")
 
-        self.round_value = rospy.get_param("/turtlex/rounding_value")
-        self.max_idle_steps = rospy.get_param("/turtlex/max_idle_steps")
+        self.round_value = rospy.get_param("/turtlex_nav/rounding_value")
+        self.max_idle_steps = rospy.get_param("/turtlex_nav/max_idle_steps")
 
         # Rewards
-        self.end_episode_points = rospy.get_param("/turtlex/end_episode_points")
-        self.decrease_dist_reward = rospy.get_param("/turtlex/decrease_goal_distance")
-        self.increase_dist_reward = rospy.get_param("/turtlex/increase_goal_distance")
+        self.end_episode_points = rospy.get_param("/turtlex_nav/end_episode_points")
+        self.decrease_dist_reward = rospy.get_param("/turtlex_nav/decrease_goal_distance")
+        self.increase_dist_reward = rospy.get_param("/turtlex_nav/increase_goal_distance")
 
-        self.max_steps = rospy.get_param("/turtlex/nsteps")
+        self.max_steps = rospy.get_param("/turtlex_nav/nsteps")
 
-        self.running_step = rospy.get_param("/turtlex/running_step")
+        self.running_step = rospy.get_param("/turtlex_nav/running_step")
 
-        self.test_areas = rospy.get_param("/turtlex/test_areas")
+        self.test_areas = rospy.get_param("/turtlex_nav/test_areas")
 
     def gen_test_goals(self, goal_number):
         """

@@ -251,41 +251,41 @@ if __name__ == '__main__':
 
     is_training = env.is_training
 
-    batch_size  = rospy.get_param("/turtlex/batch_size")
+    batch_size  = rospy.get_param("/turtlex_nav/batch_size")
 
     # Loads parameters from the ROS param server
     # Parameters are stored in a yaml file inside the "config" directory
     # They are loaded at runtime by the launch file
-    state_dim  = rospy.get_param("/turtlex/n_sectors") + 4
-    actor_hidden_dim = rospy.get_param("/turtlex/actor_hidden_dim")
-    critic_hidden_dim = rospy.get_param("/turtlex/critic_hidden_dim")
-    action_dim = rospy.get_param("/turtlex/n_actions")
+    state_dim  = rospy.get_param("/turtlex_nav/n_sectors") + 4
+    actor_hidden_dim = rospy.get_param("/turtlex_nav/actor_hidden_dim")
+    critic_hidden_dim = rospy.get_param("/turtlex_nav/critic_hidden_dim")
+    action_dim = rospy.get_param("/turtlex_nav/n_actions")
 
     # SAC parameters
-    gamma = rospy.get_param("/turtlex/gamma")
-    tau = rospy.get_param("/turtlex/tau")
-    alpha = rospy.get_param("/turtlex/alpha")
-    learning_rate = rospy.get_param("/turtlex/learning_rate")
+    gamma = rospy.get_param("/turtlex_nav/gamma")
+    tau = rospy.get_param("/turtlex_nav/tau")
+    alpha = rospy.get_param("/turtlex_nav/alpha")
+    learning_rate = rospy.get_param("/turtlex_nav/learning_rate")
 
-    max_episodes = rospy.get_param("/turtlex/nepisodes")
-    max_steps = rospy.get_param("/turtlex/nsteps")
+    max_episodes = rospy.get_param("/turtlex_nav/nepisodes")
+    max_steps = rospy.get_param("/turtlex_nav/nsteps")
 
-    monitor = rospy.get_param('/turtlex/monitor')
+    monitor = rospy.get_param('/turtlex_nav/monitor')
 
     # Bounds for the actions (linear and angular velocities)
-    action_v_min = rospy.get_param("/turtlex/action_v_min")
-    action_w_min = rospy.get_param("/turtlex/action_w_min")
-    action_v_max = rospy.get_param("/turtlex/action_v_max")
-    action_w_max = rospy.get_param("/turtlex/action_w_max")
+    action_v_min = rospy.get_param("/turtlex_nav/action_v_min")
+    action_w_min = rospy.get_param("/turtlex_nav/action_w_min")
+    action_v_max = rospy.get_param("/turtlex_nav/action_v_max")
+    action_w_max = rospy.get_param("/turtlex_nav/action_w_max")
 
     # Get the world name
-    world_name = rospy.get_param("/turtlex/world_name")
+    world_name = rospy.get_param("/turtlex_nav/world_name")
 
-    goal_reached_reward = rospy.get_param("/turtlex/end_episode_points")
+    goal_reached_reward = rospy.get_param("/turtlex_nav/end_episode_points")
 
-    load_model = rospy.get_param("/turtlex/load_model")
+    load_model = rospy.get_param("/turtlex_nav/load_model")
 
-    replay_buffer_size = rospy.get_param("/turtlex/replay_buffer_size")
+    replay_buffer_size = rospy.get_param("/turtlex_nav/replay_buffer_size")
 
     # Set the logging system
     rospack = rospkg.RosPack()

@@ -1,4 +1,4 @@
-turtlex: # namespace. If this is commented, uncomment the namespace in the main launch file
+turtlex_nav: # namespace
 
     #SAC parameters
     gamma: 0.99

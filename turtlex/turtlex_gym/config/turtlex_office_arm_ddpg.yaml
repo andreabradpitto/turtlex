@@ -1,4 +1,4 @@
-turtlex_arm: # namespace. If this is commented, uncomment the namespace in the main launch file
+turtlex_arm: # namespace
 
     batch_size: 64  # maximum size of the batches sampled from memory
     replay_buffer_size: 20000

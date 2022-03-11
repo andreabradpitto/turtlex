@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-<!--<group ns="turtlex">--> <!-- If this is uncommented, comment the namespace in turltlex_gym/config/*-->
 
   <!-- Set args - tweakable -->
   <arg name="gui"               default="true"/> <!-- Run the simulation with or without a GUI -->
@@ -56,7 +55,6 @@
   <!-- Velocity muxer -->
   <node name="mobile_base_nodelet_manager" pkg="nodelet" type="nodelet" args="manager"/>
   
-  <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>--> <!-- Se lancio la sim in Gazebo questo va in conflitto su /joint_states -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
     <rosparam param="/source_list">[/joint_states]</rosparam>
   </node>
@@ -92,5 +90,4 @@
 
   <!--<node pkg="turtlex_bt" name="turtlex_behavior_tree" type="turtlex_bt.py" output="screen"/>-->
 
-<!--</group>-->
 </launch>
