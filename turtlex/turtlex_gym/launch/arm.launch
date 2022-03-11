@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-<!--crasi tra turtlex_arm_moveit.launch e turtlex_planning_execution.launch (nella cartella turtlex_moveit_config) -->
 
-    <!-- Set args -->
+    <!-- Set args - tweakable -->
+    <arg name="gui"               default="true"/> <!-- Run the simulation with or without a GUI -->
+    <arg name="use_rviz"          default="true"/> <!-- Launch RViz or not -->
+    <arg name="debug"             default="false"/> <!-- Debug-related -->
+    <arg name="recording"         default="false"/> <!-- Debug-related; previously called "headless" (now deprecated) -->
+    <arg name="verbose"           default="false"/> <!-- Debug-related -->
+
+    <!-- Set args - tweaking not recommended -->
     <arg name="robot"           default="turtlex"/>
-    <arg name="debug"           default="false"/>
-    <arg name="gui"             default="true"/>
-    <arg name="recording"       default="false"/> <!-- previously called "headless" (now deprecated) -->
-    <arg name="paused"          default="true"/>
-    <arg name="verbose"         default="false"/>
-    <arg name="use_rviz"        default="true"/>
+    <arg name="paused"          default="true"/> <!-- Setting this to False may break the execution: https://github.com/ros-simulation/gazebo_ros_pkgs/issues/93-->
     <arg name="world_name"      value="$(find turtlex_gazebo)/worlds/office.world"/>
     <!--<arg name="world_name"      value="$(find turtlex_gazebo)/worlds/office_grip_test.world"/>-->
 
@@ -34,7 +35,7 @@
 
     <!-- include robot -->
     <arg name="urdf_file" default="$(find xacro)/xacro '$(find turtlex_description)/robots/turtlex_main.urdf.xacro'" />
-    <param name="robot_description" command="$(arg urdf_file)"/>
+    <param name="robot_description" command="$(arg urdf_file)"/> <!-- Send robot model to the ROS Parameter Server -->
 
     <!-- Load joint controller parameters for Gazebo -->
     <!--<rosparam file="$(find turtlex_moveit_config)/config/gazebo_controllers.yaml"/>-->
@@ -52,13 +53,11 @@
     <!--<node name="prepare_robot" pkg="turtlex_moveit_config" type="prepare_simulated_robot.py" />-->
 
     <!-- Velocity muxer -->
-    <node name="mobile_base_nodelet_manager" pkg="nodelet" type="nodelet" args="manager"/> <!-- Serve ? -->
+    <node name="mobile_base_nodelet_manager" pkg="nodelet" type="nodelet" args="manager"/>
 
-    <!-- If needed, broadcast static tf for robot root -->
-    <!--<node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 odom base_footprint" />--> <!-- Questo se non ho virtual joint non credo serva -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
         <rosparam param="/source_list">[/joint_states]</rosparam>
-    </node> <!-- Questo commentato perche mi dava TF redundant data: anche senza il braccio prende ugualmente le posizioni e ci va -->
+    </node>
     <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
 
     <!-- Launch MoveIt -->
