@@ -238,8 +238,8 @@ for net in range(len(net_id)): # Loop for each neural network
     hidden_dim = 30
     action_dim = 2
 
-    agent = torch.load(netspath + net_id[net] + ".pth", map_location=device)  # Load "net_id[net]" PyTorch network from memory
-    agent.eval()  # Set the network in testing mode (parameters are freezed)
+    agent = conv.PyTorchNetwork(net_id[net], torch.load(netspath + net_id[net] + ".pth", map_location=device))  # Load "net_id[net]" PyTorch network from memory)
+    agent.pytorch_network.eval()  # Set the network in testing mode (parameters are freezed)
 
     for property in range(len(eps)):
 
@@ -255,7 +255,7 @@ for net in range(len(net_id)): # Loop for each neural network
             state = np.float32(state)  # SAC algorithm action pre-processing operation (2/3)
             state = torch.FloatTensor(state).to(device).unsqueeze(0)  # SAC algorithm action pre-processing operation (3/3)
 
-            action = agent.forward(state.double())
+            action = agent.pytorch_network.forward(state.double())
 
             action = action.detach().cpu().numpy()[0]  # SAC algorithm action post-processing operation
 

@@ -139,8 +139,8 @@ if __name__ == "__main__":
 
     # Acquire outputs for the pynever-compatible (new) net
     outputs_new = new_policy_net.forward(inputs)
-    outputs_new_same_scheme = new_policy_net.forward(state)
-    outputs_new_same_scheme = outputs_new_same_scheme.detach().cpu().numpy()[0]
+    actions_new_same_scheme = new_policy_net.forward(state)
+    outputs_new_same_scheme = actions_new_same_scheme.detach().cpu().numpy()[0]
 
 
     print(f"outputs_old:\n{outputs_old}\n")
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     pol_new_pnv_pt.pytorch_network.eval()  # Not strictly necessary here
 
     outputs_pnv_pt = pol_new_pnv_pt.pytorch_network.forward(inputs.double())
-    outputs_pnv_pt_same_scheme = pol_new_pnv_pt.pytorch_network.forward(state.double())
+    outputs_pnv_pt_same_scheme = pol_new_pnv_pt.pytorch_network.forward(state.double())  # TODO qui devo scompattare o ridefinire sopra la rete con meno layer, per poter mettere qui un breakpoint e vedere l'uscita. Devo controntare poi tale valore con i layer breakpointati di PolicyNetwork
     outputs_pnv_pt_same_scheme = outputs_pnv_pt_same_scheme.detach().cpu().numpy()[0]
 
     print(f"outputs_pnv_pt:\n{outputs_pnv_pt}\n")
