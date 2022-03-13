@@ -1,30 +1,16 @@
 #!/usr/bin/env python3
 
 # Import necessary libraries
-#import time
-#import logging
-#import math
-#import random
 import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.distributions import Normal
-#from torch.autograd import Variable
 import onnx
 import pynever.strategies.conversion as conv
 import pynever.strategies.verification as ver
 import pynever.networks as networks
 import pynever.nodes as nodes
 
-# Deterministic/Stochastic process (could also have been placed under if __name__ == "__main__")
-# seed = 0
-# torch.manual_seed(seed)
-# torch.cuda.manual_seed(seed)
-# torch.cuda.manual_seed_all(seed)
-# np.random.seed(seed)
-# random.seed(seed)
-# torch.backends.cudnn.benchmark = False
-# torch.backends.cudnn.deterministic = True
 
 def weights_init_(m):
     if isinstance(m, torch.nn.Linear):
@@ -98,14 +84,10 @@ class CompActor(torch.nn.Module):  # COMPatible ACTOR (actor net compatible with
         z = self.fc5(z)
         return z
 
-# def init_const_weights(m):
-#     if isinstance(m, torch.nn.Linear):
-#         torch.nn.init.constant_(m.weight, 2/5)
-#         torch.nn.init.constant_(m.bias, 0)  # m.bias.data.fill_(0)
 
 if __name__ == "__main__":
 
-    pol_net_id = 'prev_2120_policy_net'
+    pol_net_id = 'prev_2120_policy_net'  # Specify the network to convert
 
     netspath = "nav_nets/"  # Specify networks directory path
 
@@ -117,30 +99,10 @@ if __name__ == "__main__":
 
     policy_net = torch.load(netspath + pol_net_id + ".pth", map_location=device)
     policy_net.eval()
-    
-    # model = torch.nn.Sequential(
-    #     torch.nn.Linear(state_dim, hidden_dim),
-    #     torch.nn.ReLU(),
-    #     torch.nn.Linear(hidden_dim, action_dim),
-    #     torch.nn.LogSigmoid(),
-    #     ).to(device)
-    # model.apply(init_const_weights)
-    # model.eval()
 
 
     new_policy_net = CompActor(state_dim, hidden_dim, action_dim).to(device)
 
-    # # Display all model layer weights
-    # for name, para in policy_net.named_parameters():
-    #     print('{}: {}'.format(name, para.shape))
-    #     #print(para.size())
-    #     #print(para)
-    #     print("")
-
-    #weights = dict()
-    #for name, para in policy_net.named_parameters():
-    #    weights[name] = para
-    #print(weights)
 
     with torch.no_grad():
         new_policy_net.fc1.weight.copy_(policy_net.linear1.weight)
@@ -164,11 +126,10 @@ if __name__ == "__main__":
     print(f"state:\n{state}\n")
 
     # Define inputs - pynever-compatible (new) net
-    #inputs = torch.randn([1, 10, state_dim])
+    #inputs = torch.randn([2, 3, 4, state_dim])  # Tensors can be passed in each shape as long as the last dimension is state_dim
     inputs = torch.ones([14])
     inputs[12] = 0.
     inputs[13] = 0.
-    # inputs = torch.ones([1, 14])
     print(f"inputs:\n{inputs}\n")
 
     # Acquire outputs for the loaded (old) net
@@ -178,19 +139,18 @@ if __name__ == "__main__":
 
     # Acquire outputs for the pynever-compatible (new) net
     outputs_new = new_policy_net.forward(inputs)
+    outputs_new_same_scheme = new_policy_net.forward(state)
+    outputs_new_same_scheme = outputs_new_same_scheme.detach().cpu().numpy()[0]
 
-    # outputs_model = model.forward(inputs)
 
     print(f"outputs_old:\n{outputs_old}\n")
     print(f"outputs_new:\n{outputs_new}\n")
-    # print(f"outputs_model:\n{outputs_model}\n")
-    print(f"Output equivalence = {outputs_new.data==torch.tensor(outputs_old).data}\n")
+    print(f"outputs_new_same_scheme:\n{outputs_new_same_scheme}\n")
+    #print(f"Output equivalence = {outputs_new.data==torch.tensor(outputs_old).data}\n")
 
 
     # pytorch_net = conv.PyTorchNetwork("pytorch_net", torch.load(netspath + "compactor_" + pol_net_id + ".pth", map_location=device))
-    # net = conv.PyTorchConverter().to_neural_network(pytorch_net)
-    # print("success")
-
+    # net = conv.PyTorchConverter().to_neural_network(pytorch_net)  # TODO This does NOT work due to pynever, presumably
 
 
     pol_new_pnv = networks.SequentialNetwork('NET_0', "X")
@@ -212,7 +172,7 @@ if __name__ == "__main__":
     pol_new_pnv.add_node(fc8)
 
     pol_new_pnv_pt = conv.PyTorchConverter().from_neural_network(pol_new_pnv)
-    # If I do not specify ".pytorch_network" at the end, I do not grab the actual/real pytorch network, but a PyTorchNetwork()
+    # Tip: If I do not specify ".pytorch_network" at the end, I do not grab the actual/real pytorch network, but a PyTorchNetwork()
 
     torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['4'].weight, 0)
     torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['4'].bias, 0)
@@ -235,11 +195,16 @@ if __name__ == "__main__":
     pol_new_pnv_pt.pytorch_network.eval()  # Not strictly necessary here
 
     outputs_pnv_pt = pol_new_pnv_pt.pytorch_network.forward(inputs.double())
+    outputs_pnv_pt_same_scheme = pol_new_pnv_pt.pytorch_network.forward(state.double())
+    outputs_pnv_pt_same_scheme = outputs_pnv_pt_same_scheme.detach().cpu().numpy()[0]
+
     print(f"outputs_pnv_pt:\n{outputs_pnv_pt}\n")
-    print(f"Output equivalence = {outputs_new==outputs_pnv_pt.float()}\n")
+    print(f"outputs_pnv_pt_same_scheme:\n{outputs_pnv_pt_same_scheme}\n")
+    #print(f"Output equivalence = {outputs_new==outputs_pnv_pt.float()}\n")
+    #print(f"Output equivalence = {outputs_new==outputs_pnv_pt}\n")
+    #print(f"Output equivalence = {outputs_new==outputs_pnv_pt_same_scheme}\n")
 
     torch.save(pol_new_pnv_pt.pytorch_network, netspath + "pol_new_pnv" + ".pth")
-    # TODO ma sembra create lo stessa rete anche con torch.save(pol_new_pnv_pt.pytorch_network, netspath + "pol_new_pnv" + ".pth")
 
     pol_new_pnv = conv.PyTorchConverter().to_neural_network(pol_new_pnv_pt)
 

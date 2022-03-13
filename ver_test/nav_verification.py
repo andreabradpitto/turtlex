@@ -9,7 +9,6 @@ import numpy as np
 import pynever.strategies.conversion as conv
 import pynever.strategies.verification as ver
 from datetime import datetime
-import nav_query
 
 
 # Toggle whether to perform complete verification
@@ -238,9 +237,9 @@ for net in range(len(net_id)): # Loop for each neural network
     state_dim = 14
     hidden_dim = 30
     action_dim = 2
-    agent = nav_query.SAC(state_dim, action_dim, hidden_dim=hidden_dim)
 
-    agent.load_models(netspath, net_id[net])
+    agent = torch.load(netspath + net_id[net] + ".pth", map_location=device)  # Load "net_id[net]" PyTorch network from memory
+    agent.eval()  # Set the network in testing mode (parameters are freezed)
 
     for property in range(len(eps)):
 
@@ -252,10 +251,17 @@ for net in range(len(net_id)): # Loop for each neural network
 
             state = local_input[property]
 
-            action = agent.select_action(state, eval=True)
+            state = np.asarray(state)  # SAC algorithm action pre-processing operation (1/3)
+            state = np.float32(state)  # SAC algorithm action pre-processing operation (2/3)
+            state = torch.FloatTensor(state).to(device).unsqueeze(0)  # SAC algorithm action pre-processing operation (3/3)
 
-            unnorm_action = np.array([nav_query.action_unnormalized(action[0], lin_vel_bounds[1], lin_vel_bounds[0]),
-                                      nav_query.action_unnormalized(action[1], ang_vel_bounds[1], ang_vel_bounds[0])])
+            action = agent.pytorch_network.forward(state.double())
+
+            action = agent.detach().cpu().numpy()[0]  # SAC algorithm action post-processing operation
+
+            # Normalization was performed between [-1, 1] by the Sigmoid layer
+            unnorm_action = np.array([lin_vel_bounds[0] + (action[0] + 1.0) * 0.5 * (lin_vel_bounds[1] - lin_vel_bounds[0]),
+                                      ang_vel_bounds[0] + (action[1] + 1.0) * 0.5 * (ang_vel_bounds[1] - ang_vel_bounds[0])])
 
             local_output.append(unnorm_action)
 
@@ -277,8 +283,7 @@ for net in range(len(net_id)): # Loop for each neural network
                                                                                                             # (absolute) angular velocity is lower than chosen threshold
                 ]
 
-    pytorch_net = conv.PyTorchNetwork(net_id[net], torch.load(netspath + net_id[net] + ".pth", map_location=device))  # Load "net_id[net]" PyTorch network from memory
-    net = conv.PyTorchConverter().to_neural_network(pytorch_net)  # Convert the loaded network into the internal representation
+    net = conv.PyTorchConverter().to_neural_network(agent)  # Convert the loaded network into pynever's internal representation
 
     # Verification loop
     for prop_idx in range(len(property_ids)):  # Loop for each property
