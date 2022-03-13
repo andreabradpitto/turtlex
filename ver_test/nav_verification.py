@@ -236,8 +236,8 @@ for net in range(len(net_id)): # Loop for each neural network
     local_output = []
 
     state_dim = 14
-    action_dim = 2
     hidden_dim = 30
+    action_dim = 2
     agent = nav_query.SAC(state_dim, action_dim, hidden_dim=hidden_dim)
 
     agent.load_models(netspath, net_id[net])

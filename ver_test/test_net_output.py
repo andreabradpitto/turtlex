@@ -183,8 +183,8 @@ class SAC(object):
         soft_update(self.critic_target, self.critic, self.tau)
     
     # Load model parameters
-    def load_models(self, episode, world_name):
-        self.policy.load_state_dict(torch.load(dirPath + '/nav_sac/' + world_name + '/' + str(episode) + '_policy_net.pth', map_location=self.device))
+    def load_models(self, episode):
+        self.policy.load_state_dict(torch.load(dirPath + '/nav_nets/' + str(episode) + '_policy_net.pth', map_location=self.device))
 
 
 
@@ -192,7 +192,7 @@ if __name__ == '__main__':
 
     agent = SAC(14, 2, 0.99, 0.01, 0.2, 30, 0.0003)
 
-    agent.load_models(1180, 'office')  # TODO questo da modificare prima di avviare script (1/2)
+    agent.load_models("orig1180")  # TODO questo da modificare prima di avviare script (1/2)
 
     state = [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.1, 0.21, 0.0]  # TODO questo da modificare prima di avviare script (2/2)
 
