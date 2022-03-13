@@ -64,8 +64,8 @@ if __name__ == "__main__":
         pol_new_pnv_pt.pytorch_network._modules['5'].bias.copy_(policy_net.mean_linear.bias)
     pol_new_pnv_pt.pytorch_network.eval()  # Not strictly necessary here
 
-    torch.save(pol_new_pnv_pt.pytorch_network, netspath + "pol_new_pnv" + ".pth")
+    torch.save(pol_new_pnv_pt.pytorch_network, netspath + pol_net_id + "_pnv" + ".pth")
 
-    #pol_new_pnv = conv.PyTorchConverter().to_neural_network(pol_new_pnv_pt)
-    #pol_new_pnv_onnx = conv.ONNXConverter().from_neural_network(pol_new_pnv).onnx_network
-    #onnx.save(pol_new_pnv_onnx, netspath + "pol_new_pnv" + ".onnx")
+    pol_new_pnv = conv.PyTorchConverter().to_neural_network(pol_new_pnv_pt)
+    pol_new_pnv_onnx = conv.ONNXConverter().from_neural_network(pol_new_pnv).onnx_network
+    onnx.save(pol_new_pnv_onnx, netspath + pol_net_id + "_pnv" + ".onnx")

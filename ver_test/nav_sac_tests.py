@@ -113,7 +113,7 @@ if __name__ == "__main__":
         new_policy_net.fc4.bias.copy_(policy_net.mean_linear.bias)
     new_policy_net.eval()
 
-    torch.save(new_policy_net, netspath + "compactor_" + pol_net_id + ".pth")
+    torch.save(new_policy_net, netspath + pol_net_id + "_compactor" + ".pth")
 
 
     ############# Test
@@ -204,9 +204,9 @@ if __name__ == "__main__":
     #print(f"Output equivalence = {outputs_new==outputs_pnv_pt}\n")
     #print(f"Output equivalence = {outputs_new==outputs_pnv_pt_same_scheme}\n")
 
-    torch.save(pol_new_pnv_pt.pytorch_network, netspath + "pol_new_pnv" + ".pth")
+    torch.save(pol_new_pnv_pt.pytorch_network, netspath + pol_net_id + "_pnv" + ".pth")
 
     pol_new_pnv = conv.PyTorchConverter().to_neural_network(pol_new_pnv_pt)
 
     pol_new_pnv_onnx = conv.ONNXConverter().from_neural_network(pol_new_pnv).onnx_network
-    onnx.save(pol_new_pnv_onnx, netspath + "pol_new_pnv" + ".onnx")
+    onnx.save(pol_new_pnv_onnx, netspath + pol_net_id + "_pnv" + ".onnx")

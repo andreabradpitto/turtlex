@@ -14,7 +14,7 @@ from datetime import datetime
 # Toggle whether to perform complete verification
 COMPLETE_VER = True  # default: True
 
-net_id = ['orig1180_policy_net','5020_policy_net', '1600_policy_net']  # Names of the network to verify
+net_id = ['prev_2120_policy_net_pnv',]  # Names of the network to verify
 
 netspath = "nav_nets/"  # Specify networks directory path
 
