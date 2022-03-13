@@ -255,9 +255,9 @@ for net in range(len(net_id)): # Loop for each neural network
             state = np.float32(state)  # SAC algorithm action pre-processing operation (2/3)
             state = torch.FloatTensor(state).to(device).unsqueeze(0)  # SAC algorithm action pre-processing operation (3/3)
 
-            action = agent.pytorch_network.forward(state.double())
+            action = agent.forward(state.double())
 
-            action = agent.detach().cpu().numpy()[0]  # SAC algorithm action post-processing operation
+            action = action.detach().cpu().numpy()[0]  # SAC algorithm action post-processing operation
 
             # Normalization was performed between [-1, 1] by the Sigmoid layer
             unnorm_action = np.array([lin_vel_bounds[0] + (action[0] + 1.0) * 0.5 * (lin_vel_bounds[1] - lin_vel_bounds[0]),
