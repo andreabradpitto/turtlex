@@ -12,6 +12,8 @@ import time
 
 from utils import tcolors
 
+# TODO this code is untested and not properly documented for the current version of the repository
+
 # TODO la prima classe è la stessa di quella in fetch_env. La seconda è inclusa al 100% nell'env di fetch_env.
 # Sotto ci sono 5 test da far provare a turno (o anche insieme) e il main per farli girare.
 
