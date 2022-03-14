@@ -9,6 +9,7 @@ import numpy as np
 import pynever.strategies.conversion as conv
 import pynever.strategies.verification as ver
 from datetime import datetime
+from nav_sac_conv import pnv_converter
 
 
 # Toggle whether to perform complete verification
@@ -16,9 +17,9 @@ COMPLETE_VER = True  # default: True
 
 net_id = ['prev_2120_policy_net_pnv',]  # Names of the network to verify
 
-netspath = "nav_nets/"  # Specify networks directory path
+netspath = "nav_sac_nets/"  # Specify networks directory path
 
-logpath = "nav_logs/"  # Specify logs directory path
+logpath = "nav_sac_logs/"  # Specify logs directory path
 
 property_ids = ["GlobalReach", "Local1", "GlobalPartial", "SpeedThreshold"]  # Definition of properties' names
 
@@ -238,8 +239,8 @@ for net in range(len(net_id)): # Loop for each neural network
     hidden_dim = 30
     action_dim = 2
 
-    agent = conv.PyTorchNetwork(net_id[net], torch.load(netspath + net_id[net] + ".pth", map_location=device))  # Load "net_id[net]" PyTorch network from memory)
-    agent.pytorch_network.eval()  # Set the network in testing mode (parameters are freezed)
+    agent, agent_pt, agent_onnx = pnv_converter(net_id[net], netspath, state_dim, hidden_dim, action_dim, device)  # Get PyNeVer-compatible nets
+    agent_pt.pytorch_network.eval()  # Set the network in testing mode (its parameters are freezed)
 
     for property in range(len(eps)):
 
@@ -255,7 +256,7 @@ for net in range(len(net_id)): # Loop for each neural network
             state = np.float32(state)  # SAC algorithm action pre-processing operation (2/3)
             state = torch.FloatTensor(state).to(device).unsqueeze(0)  # SAC algorithm action pre-processing operation (3/3)
 
-            action = agent.pytorch_network.forward(state.double())
+            action = agent_pt.pytorch_network.forward(state.double())
 
             action = action.detach().cpu().numpy()[0]  # SAC algorithm action post-processing operation
 
@@ -282,8 +283,6 @@ for net in range(len(net_id)): # Loop for each neural network
                     [[lin_vel_bounds[1] - delta[3][0]], [lin_vel_bounds[0]], [delta[3][1]], [delta[3][1]]]  # SpeedThreshold: linear velocity is higher than chosen threshold,
                                                                                                             # (absolute) angular velocity is lower than chosen threshold
                 ]
-
-    net = conv.PyTorchConverter().to_neural_network(agent)  # Convert the loaded network into pynever's internal representation
 
     # Verification loop
     for prop_idx in range(len(property_ids)):  # Loop for each property
@@ -330,22 +329,22 @@ for net in range(len(net_id)): # Loop for each neural network
 
             # Stream and log the names of the currently active network, property, and parameter set
             logger_nav_stream.info(
-                f"Verifying nav_NET={net.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_empty.debug(f"\nnav_NET={net.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_lp.debug(f"\nnav_NET={net.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_lb.debug(f"\nnav_NET={net.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_ub.debug(f"\nnav_NET={net.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+                f"Verifying nav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_empty.debug(f"\nnav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_lp.debug(f"\nnav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_lb.debug(f"\nnav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_ub.debug(f"\nnav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
 
             # Create the verifier
             verifier = ver.NeverVerification(ver_params[verParam_idx][1][0], ver_params[verParam_idx][1][1], ver_params[verParam_idx][2])
 
             # Check if the property is verified and measure time elapsed
             verPar_time_start = time.perf_counter()
-            safe = verifier.verify(net, prop)
+            safe = verifier.verify(agent, prop)
             verPar_time_end = time.perf_counter()
 
             # Log verification results in the verification log file
-            logger_nav_file.info(f"nav,{net.identifier},{property_ids[prop_idx]},{ver_params[verParam_idx][0]}"
+            logger_nav_file.info(f"nav,{agent.identifier},{property_ids[prop_idx]},{ver_params[verParam_idx][0]}"
                                 f",{safe},{verPar_time_end - verPar_time_start}")
 
 # Store and format the end time of the whole process

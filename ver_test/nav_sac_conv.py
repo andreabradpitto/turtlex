@@ -8,12 +8,15 @@ import pynever.networks as networks
 import pynever.nodes as nodes
 
 
-
-if __name__ == "__main__":
+def pnv_converter(pol_net_id: str, netspath: str, state_dim: int, hidden_dim: int, action_dim: int, device: str):
+    """
+    This function searches for the trained and saved network, and returns 3 PyNeVer-compatible
+    versions of the same new network: PyNeVer internal format, PyTorch format, and ONNX format
+    """
 
     pol_net_id = 'prev_2120_policy_net'  # Specify the network to convert
 
-    netspath = "nav_nets/"  # Specify networks directory path
+    netspath = "nav_sac_nets/"  # Specify networks directory path
 
     state_dim = 14
     hidden_dim = 30
@@ -69,3 +72,5 @@ if __name__ == "__main__":
     pol_new_pnv = conv.PyTorchConverter().to_neural_network(pol_new_pnv_pt)
     pol_new_pnv_onnx = conv.ONNXConverter().from_neural_network(pol_new_pnv).onnx_network
     onnx.save(pol_new_pnv_onnx, netspath + pol_net_id + "_pnv" + ".onnx")
+
+    return pol_new_pnv, pol_new_pnv_pt, pol_new_pnv_onnx
