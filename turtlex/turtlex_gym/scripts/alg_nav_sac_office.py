@@ -6,7 +6,7 @@ import rospy
 import random
 import copy
 import torch
-import os
+import rospkg
 import gym
 import time
 import numpy as np
@@ -286,9 +286,10 @@ if __name__ == '__main__':
 
     replay_buffer_size = rospy.get_param("/turtlex_nav/replay_buffer_size")
 
-    outdir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'results'))
-    gym_outdir = outdir + '/gym/' + world_name + '_nav_sac'
-    nets_outdir = outdir + '/nets_train/' + world_name + '_nav_sac'
+    rospack = rospkg.RosPack()
+    pkg_path = rospack.get_path('results')
+    gym_outdir = pkg_path + '/gym/' + world_name + '_nav_sac'
+    nets_outdir = pkg_path + '/nets_train/' + world_name + '_nav_sac'
 
     if monitor: env = gym.wrappers.Monitor(env, gym_outdir, force=True)
 

@@ -88,12 +88,12 @@ class ActorNet():
 		return self.target_network.predict(new_obs)
 
 	def save_network(self, path, ep):
-		self.network.save_weights(path + '/' + str(ep) + '_actor.h5')
-		self.target_network.save_weights(path + '/' + str(ep) + '_actor_t.h5')
+		self.network.save_weights(path + '/actor_' + str(ep) + '.h5')
+		self.target_network.save_weights(path + '/actor_t_' + str(ep) + '.h5')
 
 	def load_network(self, path, ep):
-		self.network.load_weights(path + '/' + str(ep) + '_actor.h5')
-		self.target_network.load_weights(path + '/' + str(ep) + '_actor_t.h5')
+		self.network.load_weights(path + '/actor_' + str(ep) + '.h5')
+		self.target_network.load_weights(path + '/actor_t_' + str(ep) + '.h5')
 		print(self.network.summary())
 
 
@@ -190,10 +190,10 @@ class CriticNet():
 		self.target_network.set_weights(weights_t)
 
 	def save_network(self, path, ep):
-		self.network.save_weights(path + '/' + str(ep) + '_critic.h5')
-		self.target_network.save_weights(path + '/' + str(ep) + '_critic_t.h5')
+		self.network.save_weights(path + '/critic_' + str(ep) + '.h5')
+		self.target_network.save_weights(path + '/critic_t_' + str(ep) + '.h5')
 
 	def load_network(self, path, ep):
-		self.network.load_weights(path + '/' + str(ep) + '_critic.h5')
-		self.target_network.load_weights(path + '/' + str(ep) + '_critic_t.h5')
+		self.network.load_weights(path + '/critic_' + str(ep) + '.h5')
+		self.target_network.load_weights(path + '/critic_t_' + str(ep) + '.h5')
 		print(self.network.summary())

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-import os
+import rospkg
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -108,7 +108,9 @@ if __name__ == '__main__':
     print("")
     user_input = world_input + '_' + task_input + '_' + alg_input
 
-    outdir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'results/' + user_input))
+    rospack = rospkg.RosPack()
+    pkg_path = rospack.get_path('results')
+    outdir = pkg_path + '/gym/' + user_input
     plotter = LivePlot(outdir)
 
     parser = argparse.ArgumentParser()
@@ -124,7 +126,7 @@ if __name__ == '__main__':
     else:
         uuid = plotter.plot(full=args.full, dots=args.dots, average=args.average, interpolated=args.interpolated)
 
-    plt_save_path = outdir + "/" + user_input + "_" + uuid + "_data_plot.png"
+    plt_save_path = outdir + "_" + uuid + "_data_plot.png"
     plt.savefig(plt_save_path)
     print ("Saved plot in " + plt_save_path)
     print("Opening Plot in Graphic Tools Window")

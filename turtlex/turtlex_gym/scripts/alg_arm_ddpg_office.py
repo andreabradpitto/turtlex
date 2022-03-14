@@ -4,7 +4,7 @@
 
 import rospy
 import gym
-import os
+import rospkg
 import time
 import numpy as np
 from ddpg import ActorNet, CriticNet
@@ -186,9 +186,10 @@ if __name__ == '__main__':
     rospackage_name = "turtlex_gym"
     environment_name = 'TaskArmOffice-v0'
 
-    outdir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'results'))
-    gym_outdir = outdir + '/gym/' + world_name + '_arm_ddpg'
-    nets_outdir = outdir + '/nets_train/' + world_name + '_arm_ddpg'
+    rospack = rospkg.RosPack()
+    pkg_path = rospack.get_path('results')
+    gym_outdir = pkg_path + '/gym/' + world_name + '_arm_ddpg'
+    nets_outdir = pkg_path + '/nets_train/' + world_name + '_arm_ddpg'
 
     env = gym.make(environment_name)
     if monitor: env = gym.wrappers.Monitor(env, gym_outdir, force=True)
