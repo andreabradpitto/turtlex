@@ -151,7 +151,7 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         
         self.step_counter += 1
 
-        self.action_result = self.move_joints(self.joints_pos)
+        self.action_result = self.move_joints(action)
 
         # These are for actions that move the end effectors, not the joint. Should also be used in _set_init_pose()
         #action_end_effector = self.create_action(gripper_target, self.gripper_rotation)
@@ -164,7 +164,8 @@ class TaskArmOfficeEnv(turtlex_env.TurtlexEnv, utils.EzPickle):
         else:
             rospy.loginfo(tcolors.MAGENTA + "Impossible joints configuration from action: " + str(action) + tcolors.ENDC)
             self.episode_done = True # questo va bene qui ma cerco di mettere tutto in _is_done()
-        
+
+        if self.action_result: rospy.logdebug("Pose reached ==> " + str(self.joints_pos))
         rospy.loginfo(tcolors.CYAN + "END Set Action ==> " + str(action) + tcolors.ENDC)
 
     def _get_obs(self):
