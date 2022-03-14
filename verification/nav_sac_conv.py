@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Import necessary libraries
+import os
 import torch
 import onnx
 import pynever.strategies.conversion as conv
@@ -51,23 +52,17 @@ class PolicyNetwork(torch.nn.Module):  # PyTorch needs this definition in order 
         return action, log_prob, mean, log_std
 
 
-def pnv_converter(pol_net_id: str, netspath: str, state_dim: int, hidden_dim: int, action_dim: int, device: str):
+def pnv_converter(pol_net_id: str, state_dim: int, hidden_dim: int, action_dim: int, device: str):
     """
     This function searches for the trained and saved network, and returns 3 PyNeVer-compatible
     versions of the same new network: PyNeVer internal format, PyTorch format, and ONNX format
     """
 
-    pol_net_id = 'prev_2120_policy_net'  # Specify the network to convert
+    # Specify networks directory loading and saving paths
+    netspath_load = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'results/nets_train/office_nav_sac'))
+    netspath_save = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'results/nets_ver/office_nav_sac'))
 
-    netspath = "nav_sac_nets/"  # Specify networks directory path
-
-    state_dim = 14
-    hidden_dim = 30
-    action_dim = 2
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Use CUDA, if available
-
-    policy_net = torch.load(netspath + pol_net_id + ".pth", map_location=device)  # This line needs the PolicyNetwork definition above
+    policy_net = torch.load(netspath_load + '/' + pol_net_id + ".pth", map_location=device)  # This line needs the PolicyNetwork definition above
     policy_net.eval()
 
     pol_new_pnv = networks.SequentialNetwork('NET_0', "X")
@@ -110,10 +105,10 @@ def pnv_converter(pol_net_id: str, netspath: str, state_dim: int, hidden_dim: in
         pol_new_pnv_pt.pytorch_network._modules['4'].bias.copy_(policy_net.mean_linear.bias)
     pol_new_pnv_pt.pytorch_network.eval()  # Not strictly necessary here
 
-    torch.save(pol_new_pnv_pt.pytorch_network, netspath + pol_net_id + "_pnv" + ".pth")
+    torch.save(pol_new_pnv_pt.pytorch_network, netspath_save + '/' + pol_net_id + "_pnv" + ".pth")
 
     pol_new_pnv = conv.PyTorchConverter().to_neural_network(pol_new_pnv_pt)
     pol_new_pnv_onnx = conv.ONNXConverter().from_neural_network(pol_new_pnv).onnx_network
-    onnx.save(pol_new_pnv_onnx, netspath + pol_net_id + "_pnv" + ".onnx")
+    onnx.save(pol_new_pnv_onnx, netspath_save + '/' + pol_net_id + "_pnv" + ".onnx")
 
     return pol_new_pnv, pol_new_pnv_pt, pol_new_pnv_onnx

@@ -8,6 +8,7 @@
 # training without applying the numpy() operation
 
 # Import necessary libraries
+import os
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -95,7 +96,9 @@ if __name__ == "__main__":
 
     pol_net_id = 'prev_2120_policy_net'  # Specify the network to convert
 
-    netspath = "nav_sac_nets/"  # Specify networks directory path
+    # Specify networks directory loading and saving paths
+    netspath_load = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'results/nets_train/office_nav_sac'))
+    netspath_save = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'results/nets_ver/office_nav_sac'))
 
     state_dim = 14
     hidden_dim = 30
@@ -128,7 +131,7 @@ if __name__ == "__main__":
     print("\n1st net\n")
 
     # Load the trained and saved network
-    policy_net = torch.load(netspath + pol_net_id + ".pth", map_location=device)  # This line needs the PolicyNetwork definition above
+    policy_net = torch.load(netspath_load + '/' + pol_net_id + ".pth", map_location=device)  # This line needs the PolicyNetwork definition above
     policy_net.eval()
 
     # Acquire outputs for testing
@@ -155,7 +158,7 @@ if __name__ == "__main__":
         new_policy_net.fc3.bias.copy_(policy_net.mean_linear.bias)
     new_policy_net.eval()
 
-    torch.save(new_policy_net, netspath + pol_net_id + "_compactor" + ".pth")
+    torch.save(new_policy_net, netspath_save + '/' + pol_net_id + "_compactor" + ".pth")
 
     # Acquire outputs for testing
     outputs_new = new_policy_net.forward(inputs)
@@ -170,12 +173,12 @@ if __name__ == "__main__":
     # cannot currently convert this network to PyNeVer internal representation
 
     # PyTorch saving
-    # pytorch_net = conv.PyTorchNetwork("pytorch_net", torch.load(netspath + "compactor_" + pol_net_id + ".pth", map_location=device))
+    # pytorch_net = conv.PyTorchNetwork("pytorch_net", torch.load(netspath_load + '/' + "compactor_" + pol_net_id + ".pth", map_location=device))
 
     # ONNX conversion
     # net = conv.PyTorchConverter().to_neural_network(pytorch_net)
     # net_onnx = conv.ONNXConverter().from_neural_network(net).onnx_network
-    # onnx.save(net_onnx, netspath + pol_net_id + "_pnv" + ".onnx")
+    # onnx.save(net_onnx, netspath_save '/' + + pol_net_id + "_pnv" + ".onnx")
 
 
     ############# [3rd network] PyNeVer network (working with PyNeVer)
@@ -225,12 +228,12 @@ if __name__ == "__main__":
     pol_new_pnv_pt.pytorch_network.eval()
 
     # PyTorch saving
-    torch.save(pol_new_pnv_pt.pytorch_network, netspath + pol_net_id + "_pnv" + ".pth")
+    torch.save(pol_new_pnv_pt.pytorch_network, netspath_save + '/' + pol_net_id + "_pnv" + ".pth")
 
     # ONNX conversion + saving
     pol_new_pnv = conv.PyTorchConverter().to_neural_network(pol_new_pnv_pt)
     pol_new_pnv_onnx = conv.ONNXConverter().from_neural_network(pol_new_pnv).onnx_network
-    onnx.save(pol_new_pnv_onnx, netspath + pol_net_id + "_pnv" + ".onnx")
+    onnx.save(pol_new_pnv_onnx, netspath_save + '/' + pol_net_id + "_pnv" + ".onnx")
 
     # Acquire outputs for testing
     outputs_pnv_pt = pol_new_pnv_pt.pytorch_network.forward(inputs.double())

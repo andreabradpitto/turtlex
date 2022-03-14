@@ -5,6 +5,7 @@ import time
 import logging
 import torch
 import math
+import os
 import numpy as np
 import pynever.strategies.verification as ver
 from datetime import datetime
@@ -16,9 +17,8 @@ COMPLETE_VER = True  # default: True
 
 net_id = ['prev_2120_policy_net',]  # Names of the network to verify
 
-netspath = "nav_sac_nets/"  # Specify networks directory path
-
-logpath = "nav_sac_logs/"  # Specify logs directory path
+# Specify logs directory path
+logpath = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'results/ver_logs/office_nav_sac'))
 
 property_ids = ["GlobalReach", "Local1", "GlobalPartial", "SpeedThreshold"]  # Definition of properties' names
 
@@ -98,12 +98,12 @@ logger_nav_stream = logging.getLogger("pynever.strategies.verification")
 logger_nav_file.setLevel(logging.INFO)
 logger_nav_stream.setLevel(logging.INFO)
 
-#empty_handler = logging.FileHandler(logpath + "empty_times.txt")
-#lp_handler = logging.FileHandler(logpath + "lp_times.txt")
-#lb_handler = logging.FileHandler(logpath + "lb_times.txt")
-#ub_handler = logging.FileHandler(logpath + "ub_times.txt")
-#train_handler = logging.FileHandler(logpath + "navTrainLog.txt")
-nav_file_handler = logging.FileHandler(logpath + "navVerificationLog.txt")
+#empty_handler = logging.FileHandler(logpath + "/empty_times.txt")
+#lp_handler = logging.FileHandler(logpath + "/lp_times.txt")
+#lb_handler = logging.FileHandler(logpath + "/lb_times.txt")
+#ub_handler = logging.FileHandler(logpath + "/ub_times.txt")
+#train_handler = logging.FileHandler(logpath + "/navTrainLog.txt")
+nav_file_handler = logging.FileHandler(logpath + "/nav_sac_ver_log.txt")
 nav_stream_handler = logging.StreamHandler()
 
 #empty_handler.setLevel(logging.DEBUG)
@@ -238,7 +238,7 @@ for net in range(len(net_id)): # Loop for each neural network
     hidden_dim = 30
     action_dim = 2
 
-    agent, agent_pt, agent_onnx = pnv_converter(net_id[net], netspath, state_dim, hidden_dim, action_dim, device)  # Get PyNeVer-compatible nets
+    agent, agent_pt, agent_onnx = pnv_converter(net_id[net], state_dim, hidden_dim, action_dim, device)  # Get PyNeVer-compatible nets
     agent_pt.pytorch_network.eval()  # Set the network in testing mode (its parameters are freezed)
 
     for property in range(len(eps)):

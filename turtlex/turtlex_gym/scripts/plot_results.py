@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import itertools
 import sys
 import argparse
-import rospkg
 from gym.wrappers.monitor import load_results
 from scipy.interpolate import pchip
 
@@ -108,9 +108,7 @@ if __name__ == '__main__':
     print("")
     user_input = world_input + '_' + task_input + '_' + alg_input
 
-    rospack = rospkg.RosPack()
-    pkg_path = rospack.get_path('turtlex_gym')
-    outdir = pkg_path + '/results/' + user_input
+    outdir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'results/' + user_input))
     plotter = LivePlot(outdir)
 
     parser = argparse.ArgumentParser()
@@ -130,5 +128,6 @@ if __name__ == '__main__':
     plt.savefig(plt_save_path)
     print ("Saved plot in " + plt_save_path)
     print("Opening Plot in Graphic Tools Window")
+
     plt.show()
     # pause()

@@ -4,7 +4,6 @@
 
 import rospy
 import gym
-import rospkg
 import os
 import time
 import numpy as np
@@ -187,16 +186,12 @@ if __name__ == '__main__':
     rospackage_name = "turtlex_gym"
     environment_name = 'TaskArmOffice-v0'
 
-    rospack = rospkg.RosPack()
-    pkg_path = rospack.get_path(rospackage_name)
-    outdir = pkg_path + '/results/' + world_name + '_arm_ddpg'
-
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
-        rospy.loginfo("Created folder=" + str(outdir))
+    outdir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'results'))
+    gym_outdir = outdir + '/gym/' + world_name + '_arm_ddpg'
+    nets_outdir = outdir + '/nets_train/' + world_name + '_arm_ddpg'
 
     env = gym.make(environment_name)
-    if monitor: env = gym.wrappers.Monitor(env, outdir, force=True)
+    if monitor: env = gym.wrappers.Monitor(env, gym_outdir, force=True)
 
     try:
         # Ensure that the action bound is symmetric
@@ -208,7 +203,7 @@ if __name__ == '__main__':
         rospy.logerr('Discrete Action Space')
 
     # Create Agent model
-    agent = ddpgAgent(env, batch_size=batch_size, w_per=False, is_discrete=is_discrete, buffer_size=buffer_size, outdir=outdir)
+    agent = ddpgAgent(env, batch_size=batch_size, w_per=False, is_discrete=is_discrete, buffer_size=buffer_size, outdir=nets_outdir)
 
     if load_model != False:
         agent.load_weights(load_model)

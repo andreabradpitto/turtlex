@@ -7,7 +7,6 @@ import random
 import copy
 import torch
 import os
-import rospkg
 import gym
 import time
 import numpy as np
@@ -287,22 +286,17 @@ if __name__ == '__main__':
 
     replay_buffer_size = rospy.get_param("/turtlex_nav/replay_buffer_size")
 
-    # Set the logging system
-    rospack = rospkg.RosPack()
-    pkg_path = rospack.get_path('turtlex_gym')
-    outdir = pkg_path + '/results/' + world_name + '_nav_sac'
+    outdir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'results'))
+    gym_outdir = outdir + '/gym/' + world_name + '_nav_sac'
+    nets_outdir = outdir + '/nets_train/' + world_name + '_nav_sac'
 
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
-        rospy.loginfo("Created folder=" + str(outdir))
-
-    if monitor: env = gym.wrappers.Monitor(env, outdir, force=True)
+    if monitor: env = gym.wrappers.Monitor(env, gym_outdir, force=True)
 
     # Create the agent and the replay buffer
     agent = SAC(state_dim, action_dim, gamma, tau, alpha, actor_hidden_dim, critic_hidden_dim, learning_rate)
     replay_buffer = ReplayBuffer(replay_buffer_size)
     if load_model != False:
-        agent.load_models(outdir, load_model)
+        agent.load_models(nets_outdir, load_model)
 
     rospy.logdebug('State Dimension: ' + str(state_dim))
     rospy.logdebug('Action Dimension: ' + str(action_dim))
@@ -402,12 +396,12 @@ if __name__ == '__main__':
 
 
         if ep % 20 == 0 and ep != max_episodes and is_training:
-            agent.save_models(outdir, ep)
+            agent.save_models(nets_outdir, ep)
 
     if not is_training:
         rospy.loginfo(f"\nTest results: {env.solved_counter} / {max_episodes}\n")
     else:
-        agent.save_models(outdir, max_episodes)
+        agent.save_models(nets_outdir, max_episodes)
 
     rospy.loginfo(tcolors.CYAN + "\n\n| gamma: " + str(gamma) + " | tau: " + str(tau) + " | alpha: " + str(alpha) + " | learning_rate: " +
                     str(learning_rate) + " | max_episodes: " + str(max_episodes) + " | highest_reward: " + str(highest_reward) + " |\n\n" + tcolors.ENDC)

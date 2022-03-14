@@ -39,6 +39,8 @@ cd ..
 catkin_make
 ```
 
+The `verification` and `results` folder are not Catkin packages, but must be kept inside the main `turtlex` folder anyway, otherwise the code may not work properly
+
 ## ▶️ Execution
 
 After re-sourcing (i.e., move back to the `catkin_ws` folder with `cd ..`, then type `source devel/setup.bash` and confirm) or opening a new terminal emulator, execute:
