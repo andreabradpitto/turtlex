@@ -6,6 +6,49 @@ import onnx
 import pynever.strategies.conversion as conv
 import pynever.networks as networks
 import pynever.nodes as nodes
+import torch.nn.functional as F
+from torch.distributions import Normal
+
+
+class PolicyNetwork(torch.nn.Module):  # PyTorch needs this definition in order to know how load the .pth file correctly
+    def __init__(self, state_dim, action_dim, actor_hidden_dim, log_std_min=-20, log_std_max=2):
+
+        super(PolicyNetwork, self).__init__()
+        
+        self.log_std_min = log_std_min
+        self.log_std_max = log_std_max
+        
+        self.linear1 = torch.nn.Linear(state_dim, actor_hidden_dim)
+        self.linear2 = torch.nn.Linear(actor_hidden_dim, actor_hidden_dim)
+
+        self.mean_linear = torch.nn.Linear(actor_hidden_dim, action_dim)
+        self.log_std_linear = torch.nn.Linear(actor_hidden_dim, action_dim)
+
+        self.apply(self.weights_init)
+
+    def weights_init(m):
+        if isinstance(m, torch.nn.Linear):
+            torch.nn.init.xavier_uniform_(m.weight, gain=1)
+            torch.nn.init.constant_(m.bias, 0)
+
+    def forward(self, state):
+        x = F.relu(self.linear1(state))
+        x = F.relu(self.linear2(x))
+        mean = self.mean_linear(x)
+        log_std = self.log_std_linear(x)
+        log_std = torch.clamp(log_std, min=self.log_std_min, max=self.log_std_max)
+        return mean, log_std
+
+    def sample(self, state, epsilon=1e-6):
+        mean, log_std = self.forward(state)
+        std = log_std.exp()
+        normal = Normal(mean, std)
+        x_t = normal.rsample()
+        action = (2 * torch.sigmoid(2 * x_t)) - 1
+        log_prob = normal.log_prob(x_t)
+        log_prob -= torch.log(1 - action.pow(2) + epsilon)
+        log_prob = log_prob.sum(1, keepdim=True)
+        return action, log_prob, mean, log_std
 
 
 def pnv_converter(pol_net_id: str, netspath: str, state_dim: int, hidden_dim: int, action_dim: int, device: str):
@@ -24,7 +67,7 @@ def pnv_converter(pol_net_id: str, netspath: str, state_dim: int, hidden_dim: in
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Use CUDA, if available
 
-    policy_net = torch.load(netspath + pol_net_id + ".pth", map_location=device)
+    policy_net = torch.load(netspath + pol_net_id + ".pth", map_location=device)  # This line needs the PolicyNetwork definition above
     policy_net.eval()
 
     pol_new_pnv = networks.SequentialNetwork('NET_0', "X")

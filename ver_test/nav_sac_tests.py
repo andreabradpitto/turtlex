@@ -18,11 +18,6 @@ import pynever.networks as networks
 import pynever.nodes as nodes
 
 
-def weights_init_(m):
-    if isinstance(m, torch.nn.Linear):
-        torch.nn.init.xavier_uniform_(m.weight, gain=1)
-        torch.nn.init.constant_(m.bias, 0)
-
 class PolicyNetwork(torch.nn.Module):  # [1st network] PyTorch needs this definition in order to know how load the .pth file correctly
     def __init__(self, state_dim, action_dim, actor_hidden_dim, log_std_min=-20, log_std_max=2):
 
@@ -37,7 +32,12 @@ class PolicyNetwork(torch.nn.Module):  # [1st network] PyTorch needs this defini
         self.mean_linear = torch.nn.Linear(actor_hidden_dim, action_dim)
         self.log_std_linear = torch.nn.Linear(actor_hidden_dim, action_dim)
 
-        self.apply(weights_init_)
+        self.apply(self.weights_init)
+
+    def weights_init(m):
+        if isinstance(m, torch.nn.Linear):
+            torch.nn.init.xavier_uniform_(m.weight, gain=1)
+            torch.nn.init.constant_(m.bias, 0)
 
     def forward(self, state):
         x = F.relu(self.linear1(state))
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     print("\n1st net\n")
 
     # Load the trained and saved network
-    policy_net = torch.load(netspath + pol_net_id + ".pth", map_location=device)
+    policy_net = torch.load(netspath + pol_net_id + ".pth", map_location=device)  # This line needs the PolicyNetwork definition above
     policy_net.eval()
 
     # Acquire outputs for testing

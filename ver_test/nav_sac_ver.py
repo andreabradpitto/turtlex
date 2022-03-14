@@ -6,16 +6,15 @@ import logging
 import torch
 import math
 import numpy as np
-import pynever.strategies.conversion as conv
 import pynever.strategies.verification as ver
 from datetime import datetime
-from nav_sac_conv import pnv_converter
+from nav_sac_conv import PolicyNetwork, pnv_converter
 
 
 # Toggle whether to perform complete verification
 COMPLETE_VER = True  # default: True
 
-net_id = ['prev_2120_policy_net_pnv',]  # Names of the network to verify
+net_id = ['prev_2120_policy_net',]  # Names of the network to verify
 
 netspath = "nav_sac_nets/"  # Specify networks directory path
 
@@ -274,7 +273,7 @@ for net in range(len(net_id)): # Loop for each neural network
                     [[1, 0], [-1, 0], [0, 1], [0, -1]]  # SpeedThreshold: 2 conditions for each output
                 ]
     unsafe_vecs = [
-                    [[lin_vel_bounds[0]], [-lin_vel_bounds[1]], [lin_vel_bounds[0]], [-lin_vel_bounds[1]]],  # GlobalReach: outputs' lower and  upper bounds
+                    [[lin_vel_bounds[0]], [-lin_vel_bounds[1]], [ang_vel_bounds[0]], [-ang_vel_bounds[1]]],  # GlobalReach: outputs' lower and  upper bounds
                     [[local_output[1][0] - delta[1][0]], [-local_output[1][0] - delta[1][0]],\
                         [local_output[1][1] - delta[1][1]], [-local_output[1][1] - delta[1][1]]],  #Local1: all the outputs' local lower and upper bounds
                     [[lin_vel_bounds[1]], [-lin_vel_bounds[0] - delta[2][0]],\
@@ -329,11 +328,11 @@ for net in range(len(net_id)): # Loop for each neural network
 
             # Stream and log the names of the currently active network, property, and parameter set
             logger_nav_stream.info(
-                f"Verifying nav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_empty.debug(f"\nnav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_lp.debug(f"\nnav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_lb.debug(f"\nnav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_ub.debug(f"\nnav_NET={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+                f"Verifying nav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_empty.debug(f"\nnav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_lp.debug(f"\nnav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_lb.debug(f"\nnav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_ub.debug(f"\nnav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
 
             # Create the verifier
             verifier = ver.NeverVerification(ver_params[verParam_idx][1][0], ver_params[verParam_idx][1][1], ver_params[verParam_idx][2])
