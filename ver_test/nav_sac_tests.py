@@ -60,19 +60,19 @@ class CompActor(torch.nn.Module):  # COMPatible ACTOR (actor net compatible with
         super(CompActor, self).__init__()
         self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
         self.fc2 = torch.nn.Linear(hidden_dim, hidden_dim)
-        self.fc3 = torch.nn.Linear(hidden_dim, hidden_dim)  # "* 2" layer
-        self.fc4 = torch.nn.Linear(hidden_dim, action_dim)  # Ex "mean" layer
+        self.fc3 = torch.nn.Linear(hidden_dim, action_dim)  # Ex "mean" layer
+        self.fc4 = torch.nn.Linear(action_dim, action_dim)  # "* 2" layer
         self.fc5 = torch.nn.Linear(action_dim, action_dim)  # "* 2; - 1" layer
 
-        torch.nn.init.constant_(self.fc3.weight, 0)
-        torch.nn.init.constant_(self.fc3.bias, 0)
+        torch.nn.init.constant_(self.fc4.weight, 0)
+        torch.nn.init.constant_(self.fc4.bias, 0)
         torch.nn.init.constant_(self.fc5.weight, 0)
         torch.nn.init.constant_(self.fc5.bias, -1)
 
         with torch.no_grad():
-            for idx, elem in enumerate(self.fc3.weight):
+            for idx, elem in enumerate(self.fc4.weight):
                 elem[idx] = 2
-            for idx, elem in enumerate(self.fc5.weight):
+            for idx, elem in enumerate(self.fc4.weight):
                 elem[idx] = 2
 
     def forward(self, x):
@@ -109,8 +109,8 @@ if __name__ == "__main__":
         new_policy_net.fc1.bias.copy_(policy_net.linear1.bias)
         new_policy_net.fc2.weight.copy_(policy_net.linear2.weight)
         new_policy_net.fc2.bias.copy_(policy_net.linear2.bias)
-        new_policy_net.fc4.weight.copy_(policy_net.mean_linear.weight)
-        new_policy_net.fc4.bias.copy_(policy_net.mean_linear.bias)
+        new_policy_net.fc3.weight.copy_(policy_net.mean_linear.weight)
+        new_policy_net.fc3.bias.copy_(policy_net.mean_linear.bias)
     new_policy_net.eval()
 
     torch.save(new_policy_net, netspath + pol_net_id + "_compactor" + ".pth")
@@ -135,6 +135,7 @@ if __name__ == "__main__":
     # Acquire outputs for the loaded (old) net
     _, _, action, _ = policy_net.sample(state)  # == outputs_old, _ = policy_net.forward(inputs)
     action = (2 * torch.sigmoid(2 * action)) - 1
+    print(f"outputs_old pre-detach:\n{action}\n")
     outputs_old = action.detach().cpu().numpy()[0]
 
     # Acquire outputs for the pynever-compatible (new) net
@@ -162,9 +163,9 @@ if __name__ == "__main__":
     pol_new_pnv.add_node(fc3)
     rl4 = nodes.ReLUNode("RL4", fc3.out_dim)
     pol_new_pnv.add_node(rl4)
-    fc5 = nodes.FullyConnectedNode("FC5", rl4.out_dim, hidden_dim)  # "* 2" layer
+    fc5 = nodes.FullyConnectedNode("FC5", rl4.out_dim, action_dim)  # Ex "mean" layer
     pol_new_pnv.add_node(fc5)
-    fc6 = nodes.FullyConnectedNode("FC6", fc5.out_dim, action_dim)  # Ex "mean" layer
+    fc6 = nodes.FullyConnectedNode("FC6", fc5.out_dim, action_dim)  # "* 2" layer
     pol_new_pnv.add_node(fc6)
     sm7 = nodes.SigmoidNode("SM7", fc6.out_dim)
     pol_new_pnv.add_node(sm7)
@@ -174,13 +175,13 @@ if __name__ == "__main__":
     pol_new_pnv_pt = conv.PyTorchConverter().from_neural_network(pol_new_pnv)
     # Tip: If I do not specify ".pytorch_network" at the end, I do not grab the actual/real pytorch network, but a PyTorchNetwork()
 
-    torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['4'].weight, 0)
-    torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['4'].bias, 0)
+    torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['5'].weight, 0)
+    torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['5'].bias, 0)
     torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['7'].weight, 0)
     torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['7'].bias, -1)
 
     with torch.no_grad():
-        for idx, elem in enumerate(pol_new_pnv_pt.pytorch_network._modules['4'].weight):
+        for idx, elem in enumerate(pol_new_pnv_pt.pytorch_network._modules['5'].weight):
             elem[idx] = 2
         for idx, elem in enumerate(pol_new_pnv_pt.pytorch_network._modules['7'].weight):
             elem[idx] = 2
@@ -190,12 +191,13 @@ if __name__ == "__main__":
         pol_new_pnv_pt.pytorch_network._modules['0'].bias.copy_(policy_net.linear1.bias)
         pol_new_pnv_pt.pytorch_network._modules['2'].weight.copy_(policy_net.linear2.weight)
         pol_new_pnv_pt.pytorch_network._modules['2'].bias.copy_(policy_net.linear2.bias)
-        pol_new_pnv_pt.pytorch_network._modules['5'].weight.copy_(policy_net.mean_linear.weight)
-        pol_new_pnv_pt.pytorch_network._modules['5'].bias.copy_(policy_net.mean_linear.bias)
+        pol_new_pnv_pt.pytorch_network._modules['4'].weight.copy_(policy_net.mean_linear.weight)
+        pol_new_pnv_pt.pytorch_network._modules['4'].bias.copy_(policy_net.mean_linear.bias)
     pol_new_pnv_pt.pytorch_network.eval()  # Not strictly necessary here
 
     outputs_pnv_pt = pol_new_pnv_pt.pytorch_network.forward(inputs.double())
     outputs_pnv_pt_same_scheme = pol_new_pnv_pt.pytorch_network.forward(state.double())  # TODO qui devo scompattare o ridefinire sopra la rete con meno layer, per poter mettere qui un breakpoint e vedere l'uscita. Devo controntare poi tale valore con i layer breakpointati di PolicyNetwork
+    print(f"outputs_pnv_pt_same_scheme pre-detach:\n{outputs_pnv_pt_same_scheme}\n")
     outputs_pnv_pt_same_scheme = outputs_pnv_pt_same_scheme.detach().cpu().numpy()[0]
 
     print(f"outputs_pnv_pt:\n{outputs_pnv_pt}\n")

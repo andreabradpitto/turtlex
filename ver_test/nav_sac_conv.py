@@ -33,9 +33,9 @@ if __name__ == "__main__":
     pol_new_pnv.add_node(fc3)
     rl4 = nodes.ReLUNode("RL4", fc3.out_dim)
     pol_new_pnv.add_node(rl4)
-    fc5 = nodes.FullyConnectedNode("FC5", rl4.out_dim, hidden_dim)  # "* 2" layer
+    fc5 = nodes.FullyConnectedNode("FC5", rl4.out_dim, action_dim)  # Ex "mean" layer
     pol_new_pnv.add_node(fc5)
-    fc6 = nodes.FullyConnectedNode("FC6", fc5.out_dim, action_dim)  # Ex "mean" layer
+    fc6 = nodes.FullyConnectedNode("FC6", fc5.out_dim, action_dim)  # "* 2" layer
     pol_new_pnv.add_node(fc6)
     sm7 = nodes.SigmoidNode("SM7", fc6.out_dim)
     pol_new_pnv.add_node(sm7)
@@ -44,13 +44,13 @@ if __name__ == "__main__":
 
     pol_new_pnv_pt = conv.PyTorchConverter().from_neural_network(pol_new_pnv)
 
-    torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['4'].weight, 0)
-    torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['4'].bias, 0)
+    torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['5'].weight, 0)
+    torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['5'].bias, 0)
     torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['7'].weight, 0)
     torch.nn.init.constant_(pol_new_pnv_pt.pytorch_network._modules['7'].bias, -1)
 
     with torch.no_grad():
-        for idx, elem in enumerate(pol_new_pnv_pt.pytorch_network._modules['4'].weight):
+        for idx, elem in enumerate(pol_new_pnv_pt.pytorch_network._modules['5'].weight):
             elem[idx] = 2
         for idx, elem in enumerate(pol_new_pnv_pt.pytorch_network._modules['7'].weight):
             elem[idx] = 2
@@ -60,8 +60,8 @@ if __name__ == "__main__":
         pol_new_pnv_pt.pytorch_network._modules['0'].bias.copy_(policy_net.linear1.bias)
         pol_new_pnv_pt.pytorch_network._modules['2'].weight.copy_(policy_net.linear2.weight)
         pol_new_pnv_pt.pytorch_network._modules['2'].bias.copy_(policy_net.linear2.bias)
-        pol_new_pnv_pt.pytorch_network._modules['5'].weight.copy_(policy_net.mean_linear.weight)
-        pol_new_pnv_pt.pytorch_network._modules['5'].bias.copy_(policy_net.mean_linear.bias)
+        pol_new_pnv_pt.pytorch_network._modules['4'].weight.copy_(policy_net.mean_linear.weight)
+        pol_new_pnv_pt.pytorch_network._modules['4'].bias.copy_(policy_net.mean_linear.bias)
     pol_new_pnv_pt.pytorch_network.eval()  # Not strictly necessary here
 
     torch.save(pol_new_pnv_pt.pytorch_network, netspath + pol_net_id + "_pnv" + ".pth")
