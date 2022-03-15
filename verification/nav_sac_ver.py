@@ -316,10 +316,10 @@ for net in range(len(net_id)): # Loop for each neural network
         out_pred_bias.append(np.array(unsafe_vecs[prop_idx], dtype=float))
 
         # Code block useful for debugging purposes
-        print("\nin_pred_mat:\n" + str(in_pred_mat) + "\n")
-        print("\nin_pred_bias:\n" + str(in_pred_bias) + "\n")
-        print("\nout_pred_mat:\n" + str(out_pred_mat) + "\n")
-        print("\nout_pred_bias:\n" + str(out_pred_bias) + "\n")
+        #print("\nin_pred_mat:\n" + str(in_pred_mat) + "\n")
+        #print("\nin_pred_bias:\n" + str(in_pred_bias) + "\n")
+        #print("\nout_pred_mat:\n" + str(out_pred_mat) + "\n")
+        #print("\nout_pred_bias:\n" + str(out_pred_bias) + "\n")
 
         prop = ver.NeVerProperty(in_pred_mat, in_pred_bias, out_pred_mat, out_pred_bias)  # Create the property to be verified
 
