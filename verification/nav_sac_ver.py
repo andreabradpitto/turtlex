@@ -144,6 +144,11 @@ distance_bounds = [0.0, 18.02775637732]
 lin_vel_bounds = [0.0, 0.22]
 ang_vel_bounds = [-2.0, 2.0]
 
+# Network dimensions definition
+state_dim = 14  # input layer dimension
+hidden_dim = 30  # hidden layers dimension
+action_dim = 2  # output layer dimension
+
 # Local input tolerance: laser scans (x10), goal heading, goal distance, linear velocity, angular velocity
 # These tolerances define the input area to verify; the higher the value, the more general the property is
 eps = [
@@ -216,10 +221,6 @@ for net in range(len(net_id)): # Loop for each neural network
 
     # Computing local output values (for the local properties only)
     local_output = []
-
-    state_dim = 14
-    hidden_dim = 30
-    action_dim = 2
 
     agent, agent_pt, agent_onnx = pnv_converter(net_id[net], state_dim, hidden_dim, action_dim, device)  # Get PyNeVer-compatible nets
     agent_pt.pytorch_network.eval()  # Set the network in testing mode (its parameters are freezed)
