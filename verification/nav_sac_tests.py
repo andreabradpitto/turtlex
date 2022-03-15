@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # 3 networks here: PolicyNetwork is the one which training has been performed on. CompActor is a PyTorch replica
-# with a more standard definition (e.g. no sample(), but just a forward()), but it currently does not work with
-# pynever. Lastly, the 3rd network is created starting from pynever and works fine.
+# with a more standard definition (e.g. no sample(), but just a forward()). It still does not fully work.
+# Lastly, the 3rd network is created starting directly from PyNeVer.
 # There is a little difference in the outputs of the 1st and 3rd nets due to the double() state conversion
 # needed by the latter, and to the subsequent Tensor .numpy() conversion. This could be solved by re-performing
 # training without applying the numpy() operation
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     print(f"outputs_old:\n{outputs_old}\n")
 
 
-    ############# [2nd network] CompActor (currently not compatible with PyNeVer)
+    ############# [2nd network] CompActor (currently not working properly)
 
     print("\n2nd net\n")
 
@@ -158,7 +158,9 @@ if __name__ == "__main__":
         new_policy_net.fc3.bias.copy_(policy_net.mean_linear.bias)
     new_policy_net.eval()
 
-    torch.save(new_policy_net, netspath_save + '/' + pol_net_id + "_compactor" + ".pth")
+    new_policy_net.input_id = 'X'
+
+    torch.save(new_policy_net, netspath_save + '/' + pol_net_id + "_compactor.pth")
 
     # Acquire outputs for testing
     outputs_new = new_policy_net.forward(inputs)
@@ -170,15 +172,15 @@ if __name__ == "__main__":
     print(f"outputs_new_same_scheme:\n{outputs_new_same_scheme}\n")
 
     # The conversion (1st ONNX instruction) does NOT work due to PyNeVer, presumably:
-    # cannot currently convert this network to PyNeVer internal representation
+    # I cannot currently convert this network to PyNeVer internal representation
 
     # PyTorch saving
-    # pytorch_net = conv.PyTorchNetwork("pytorch_net", torch.load(netspath_load + '/' + "compactor_" + pol_net_id + ".pth", map_location=device))
+    #pytorch_net = conv.PyTorchNetwork("pytorch_net", torch.load(netspath_save + '/' + pol_net_id + "_compactor.pth", map_location=device))
 
     # ONNX conversion
-    # net = conv.PyTorchConverter().to_neural_network(pytorch_net)
-    # net_onnx = conv.ONNXConverter().from_neural_network(net).onnx_network
-    # onnx.save(net_onnx, netspath_save '/' + + pol_net_id + "_pnv" + ".onnx")
+    #net = conv.PyTorchConverter().to_neural_network(pytorch_net)
+    #net_onnx = conv.ONNXConverter().from_neural_network(net).onnx_network
+    #onnx.save(net_onnx, netspath_save + '/' + pol_net_id + "_pnv" + ".onnx")
 
 
     ############# [3rd network] PyNeVer network (working with PyNeVer)
