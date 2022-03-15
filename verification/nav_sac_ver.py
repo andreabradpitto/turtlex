@@ -210,24 +210,6 @@ input_ub = [
                                                    # for the last 1: angular velocity
            ]
 
-# Queste venivano appese ad input_lb e input_ub TODO che poi in caso va nel loop mi sa, per via di eps
-# Property-specific additional input constraints
-# OutBounds: matrix: [] ; bias: []
-# Near0: tiv*vr + d0 >= d + e   =>  -tiv*vr + d <=  d0 - e   =>   matrix: [0, -tiv, 1] ; bias: [d0 - e]
-# Far0:  tiv*vr + d0 <= d - e   =>   tiv*vr - d <= -d0 - e   =>   matrix: [0, tiv, -1] ; bias: [-d0 - e]
-#in_pred_mat_prop = [[], [0, -tiv, 1], [0, tiv, -1]]
-#in_pred_bias_prop = [[], [d0 - e], [-d0 - e]]
-
-# in_pred_mat_prop =  [
-#                         [],
-#                         [0, -tiv, 1],
-#                         [0, tiv, -1]
-#                     ]
-# in_pred_bias_prop = [
-#                         [],
-#                         [d0 - e],
-#                         [-d0 - e]
-#                     ]
 
 for net in range(len(net_id)): # Loop for each neural network
 
@@ -298,11 +280,6 @@ for net in range(len(net_id)): # Loop for each neural network
             in_pred_mat.append(ub_constraint)
             in_pred_bias.append([-input_lb[prop_idx][k]])
             in_pred_bias.append([input_ub[prop_idx][k]])
-
-        # # Only add property-specific matrixes and vectors if they are actually present TODO
-        # if in_pred_mat_prop[prop_idx] and in_pred_bias_prop[prop_idx]:
-        #     in_pred_mat.append(np.array(in_pred_mat_prop[prop_idx]))
-        #     in_pred_bias.append(np.array(in_pred_bias_prop[prop_idx]))
 
         # Convert matrixes and vectors into NumPy arrays
         in_pred_mat = np.array(in_pred_mat)
