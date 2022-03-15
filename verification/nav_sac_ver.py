@@ -134,7 +134,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Use CUD
 start_time = datetime.now()
 f_start_time = start_time.strftime("%H:%M:%S")
 
-if COMPLETE_VER:  # If True, skip "Complete" verification parameter set
+if not COMPLETE_VER:  # If False, skip "Complete" verification parameter set
     ver_params = ver_params[:-1]
 
 # Input and output bounds declaration
