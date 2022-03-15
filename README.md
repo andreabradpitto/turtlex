@@ -27,7 +27,7 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 - [TensorFlow](https://www.tensorflow.org/install/)
 - [OpenCV](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)
 - [MPI fo Python](https://mpi4py.readthedocs.io/en/stable/install.html) (`python -m pip install mpi4py`)
-- [pyassimp](https://pypi.org/project/pyassimp/) (`python -m pip install pyassimp`) [due to this issue](https://github.com/ros-planning/moveit/issues/86)
+- [pyassimp](https://pypi.org/project/pyassimp/) (`python -m pip install pyassimp`) due to [this](https://github.com/ros-planning/moveit/issues/86) issue
 
 ## ✅ Installation
 
