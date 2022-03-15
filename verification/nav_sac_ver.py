@@ -224,6 +224,7 @@ for net in range(len(net_id)): # Loop for each neural network
 
     agent, agent_pt, agent_onnx = pnv_converter(net_id[net], state_dim, hidden_dim, action_dim, device)  # Get PyNeVer-compatible nets
     agent_pt.pytorch_network.eval()  # Set the network in testing mode (its parameters are freezed)
+    agent_pt.pytorch_network.to(device)
 
     for property in range(len(eps)):
 
