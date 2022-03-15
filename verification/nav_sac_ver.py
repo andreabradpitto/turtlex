@@ -3,10 +3,10 @@
 # Import necessary libraries
 import time
 import logging
-import torch
 import math
 import os
 import numpy as np
+import torch
 import pynever.strategies.verification as ver
 from datetime import datetime
 from nav_sac_conv import PolicyNetwork, pnv_converter
@@ -16,9 +16,6 @@ from nav_sac_conv import PolicyNetwork, pnv_converter
 COMPLETE_VER = True  # default: True
 
 net_id = ['prev_2120_policy_net',]  # Names of the network to verify
-
-# Specify logs directory path
-logpath = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'results/ver_logs/office_nav_sac'))
 
 property_ids = ["GlobalReach", "Local1", "GlobalPartial", "SpeedThreshold"]  # Definition of properties' names
 
@@ -80,6 +77,10 @@ ver_params = [
               ["Mixed",         ["best_n_neurons", [1]],    None],
               ["Complete",      ["best_n_neurons", [100]],  None]
              ]
+
+
+# Specify logs directory path
+logpath = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'results/ver_logs/office_nav_sac'))
 
 # Loggers and handlers definition and setup
 #logger_empty = logging.getLogger("pynever.strategies.abstraction.empty_times")
@@ -301,7 +302,6 @@ for net in range(len(net_id)): # Loop for each neural network
         prop = ver.NeVerProperty(in_pred_mat, in_pred_bias, out_pred_mat, out_pred_bias)  # Create the property to be verified
 
         for verParam_idx in range(len(ver_params)):  # Loop for each verification parameter set
-        #for verParam_idx in range(0):
 
             # Stream and log the names of the currently active network, property, and parameter set
             logger_nav_stream.info(
