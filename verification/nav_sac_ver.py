@@ -13,7 +13,7 @@ from nav_sac_conv import PolicyNetwork, pnv_converter
 
 
 # Toggle whether to perform complete verification
-COMPLETE_VER = True  # default: True
+COMPLETE_VER = False  # default: True
 
 net_id = ['prev_2120_policy_net',]  # Names of the network to verify
 

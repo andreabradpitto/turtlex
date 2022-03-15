@@ -1,0 +1,10 @@
+Net_ID,Property,Param_set,Safe,Time_elapsed
+
+nav,NET_0,GlobalReach,Over-Approx,True,0.6234102359994722
+nav,NET_0,GlobalReach,Mixed,True,1.2749355619998823
+nav,NET_0,Local1,Over-Approx,True,0.2518076540000038
+nav,NET_0,Local1,Mixed,True,0.3512179740027932
+nav,NET_0,GlobalPartial,Over-Approx,False,0.5511707609985024
+nav,NET_0,GlobalPartial,Mixed,False,1.3811892570010968
+nav,NET_0,SpeedThreshold,Over-Approx,False,0.7139744109990716
+nav,NET_0,SpeedThreshold,Mixed,False,1.4271118140022736
