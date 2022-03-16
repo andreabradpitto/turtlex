@@ -32,33 +32,41 @@ class LivePlot(object):
         matplotlib.rcParams['toolbar'] = 'None'
         plt.style.use('ggplot')
         plt.xlabel("episodes")
-        plt.ylabel("cumulated episode rewards")
-        fig = plt.gcf().canvas.manager.set_window_title('averaged_simulation_graph')
+        plt.ylabel(self.data_key.replace("_", " "))
+        fig = plt.gcf().canvas.manager.set_window_title('OpenAI Gym results plot - ' + str(self.data_key))
         matplotlib.rcParams.update({'font.size': 15})
 
+    def expand(lst, n):
+        lst = [[i] * n for i in lst]
+        lst = list(itertools.chain.from_iterable(lst))
+        return lst
+
     def plot(self, full=True, dots=False, average=0, interpolated=0):
-        #results = gym.monitoring.load_results(self.outdir)
         results = load_results(self.outdir)
         data =  results[self.data_key]
-        avg_data = []
 
         if full:
-            plt.plot(data, color='blue')
+            plt.plot(data, color=self.line_color)
+
         if dots:
-            plt.plot(data, '.', color='black')
+            plt.plot(data, '.', color=self.line_color)
+
         if average > 0:
+            avg_data = []
             average = int(average)
             for i, val in enumerate(data):
                 if i % average == 0:
-                    if (i + average) < len(data)+average:
+                    if (i + average) < len(data) + average:
                         avg =  sum(data[i : i + average]) / average
                         avg_data.append(avg)
-            new_data = expand(avg_data,average)
-            plt.plot(new_data, color='red', linewidth=2.5) 
+
+            new_data = self.expand(avg_data,average)
+            plt.plot(new_data, color=self.line_color, linewidth=2.5)
+ 
         if interpolated > 0:
             avg_data = []
             avg_data_points = []
-            n = len(data)/interpolated
+            n = len(data) / interpolated
             if n == 0:
                 n = 1
             data_fix = 0
@@ -73,33 +81,20 @@ class LivePlot(object):
             
             x = np.arange(len(avg_data))
             y = np.array(avg_data)
-            #print x
-            #print y
-            #print str(len(avg_data)*n)
-            #print data_fix
+
             interp = pchip(avg_data_points, avg_data)
             xx = np.linspace(0, len(data) - data_fix, 1000)
-            plt.plot(xx, interp(xx), color='green', linewidth=3.5)        
-
-        # pause so matplotlib will display
-        # may want to figure out matplotlib animation or use a different library in the future
-        # plt.pause(0.000001)
+            plt.plot(xx, interp(xx), color=self.line_color, linewidth=3.5)        
 
         uuid = results['manifests']
         _, _, uuid1, uuid2, _, _ = str(uuid).split(".")
         uuid = uuid1 + "." + uuid2
         return uuid
 
-def expand(lst, n):
-    lst = [[i] * n for i in lst]
-    lst = list(itertools.chain.from_iterable(lst))
-    return lst
-
-def pause():
-    programPause = input("Press the <ENTER> key to finish...")
 
 if __name__ == '__main__':
 
+    # Let the user choose which expriment results to plot
     world_input = input("Type world name [office]: ").lower().strip()
     print("")
     task_input = input("Type task name [nav, arm]: ").lower().strip()
@@ -111,25 +106,48 @@ if __name__ == '__main__':
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path('results')
     outdir = pkg_path + '/gym/' + user_input
-    plotter = LivePlot(outdir)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--full", action='store_true', help="print the full data plot with lines")
-    parser.add_argument("-d", "--dots", action='store_true', help="print the full data plot with dots")
-    parser.add_argument("-a", "--average", type=int, nargs='?', const=50, metavar="N", help="plot an averaged graph using N as average size delimiter. Default = 50")
-    parser.add_argument("-i", "--interpolated", type=int, nargs='?', const=50, metavar="M", help="plot an interpolated graph using M as interpolation amount. Default = 50")
+    parser.add_argument("-f", "--full", action='store_true',\
+                         help="print the full data plot with lines")
+    parser.add_argument("-d", "--dots", action='store_true',\
+                         help="print the full data plot with dots")
+    parser.add_argument("-a", "--average", type=int, nargs='?', const=50, metavar="N",\
+                         help="plot an averaged graph using N as average size delimiter. Default = 50")
+    parser.add_argument("-i", "--interpolated", type=int, nargs='?', const=50, metavar="M",\
+                         help="plot an interpolated graph using M as interpolation amount. Default = 50")
     args = parser.parse_args()
 
-    if len(sys.argv)==1:
-        # When no arguments given, plot full data graph
-        uuid = plotter.plot(full=True)
-    else:
-        uuid = plotter.plot(full=args.full, dots=args.dots, average=args.average, interpolated=args.interpolated)
 
-    plt_save_path = outdir + "_" + uuid + "_data_plot.png"
+    ########## Episode rewards plot
+    rew_plotter = LivePlot(outdir)
+
+    if len(sys.argv) == 1:
+        # When no arguments are given, plot full data graph
+        uuid = rew_plotter.plot(full=True)
+    else:
+        uuid = rew_plotter.plot(full=args.full, dots=args.dots, average=args.average, interpolated=args.interpolated)
+
+    plt_save_path = outdir + "/" + "gym_plot_ep_rewards_" + uuid + ".png"
     plt.savefig(plt_save_path)
-    print ("Saved plot in " + plt_save_path)
-    print("Opening Plot in Graphic Tools Window")
+    print ("Saved episode rewards plot in " + plt_save_path)
+    print("Opening episode rewards plot in Graphic Tools Window")
 
     plt.show()
-    # pause()
+
+
+    ########## Episode lengths plot
+    len_plotter = LivePlot(outdir, data_key='episode_lengths', line_color='green')
+
+    if len(sys.argv) == 1:
+        # When no arguments are given, plot full data graph
+        uuid = len_plotter.plot(full=True)
+    else:
+        uuid = len_plotter.plot(full=args.full, dots=args.dots, average=args.average, interpolated=args.interpolated)
+
+    plt_save_path = outdir + "/" + "gym_plot_ep_lengths_" + uuid + ".png"
+    plt.savefig(plt_save_path)
+    print ("Saved episode lengths plot in " + plt_save_path)
+    print("Opening episode lengths plot in Graphic Tools Window")
+
+    plt.show()
