@@ -211,7 +211,7 @@ input_ub = [
                 laser_bounds[1], laser_bounds[1], laser_bounds[1], heading_bounds[1], distance_bounds[1],\
                     lin_vel_bounds[1], ang_vel_bounds[1]],  # GlobalPartial: all the sensors' upper bounds, except for the 5th laser scan
 
-            [laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[0] + eps[2][0], laser_bounds[1], laser_bounds[1],\
+            [laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[0] + eps[3][0], laser_bounds[1], laser_bounds[1],\
                 laser_bounds[1], laser_bounds[1], laser_bounds[1], heading_bounds[1], distance_bounds[1],\
                     lin_vel_bounds[1], eps[3][2]]  # SpeedThreshold: all the sensors' upper bounds, except
                                                    # for the last 1: angular velocity
