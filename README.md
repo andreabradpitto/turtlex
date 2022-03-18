@@ -48,6 +48,24 @@ After re-sourcing (i.e., move back to the `catkin_ws` folder with `cd ..`, then 
 roslaunch turtlex_bt bt.launch
 ```
 
+In order to run the verification, move to the `verification` folder and execute:
+
+```bash
+./nav_sac_ver.py
+```
+
+Notice that in order to run the navigation task it is needed to manually modify the `sig_fod()` function in the abstraction.py file of the local installation of pynever. It has to become equivalent to this:
+
+```python
+def sig_fod(x: float) -> float:
+    """
+    Utility function computing the first order derivative of the logistic function of the input.
+    """
+    x = np.longdouble(x)  # <class 'numpy.float128'>
+    return float(np.exp(-x) / np.power(1 + np.exp(-x), 2))
+    #return math.exp(-x) / math.pow(1 + math.exp(-x), 2)
+```
+
 ## 📫 Author
 
 [Andrea Pitto](https://github.com/andreabradpitto) - s3942710@studenti.unige.it
