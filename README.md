@@ -54,7 +54,7 @@ In order to run the verification, move to the `verification` folder and execute:
 ./nav_sac_ver.py
 ```
 
-Notice that in order to run the navigation task it is needed to manually modify the `sig_fod()` function in the abstraction.py file of the local installation of pynever. It has to become equivalent to this:
+Notice that in order to run the navigation task it is needed to manually modify the `sig_fod()` function in the abstraction.py file of the local installation of pyNeVer (as of version `0.0.1a7`). It has to become equivalent to this:
 
 ```python
 def sig_fod(x: float) -> float:
