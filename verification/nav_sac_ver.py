@@ -61,7 +61,7 @@ When adding a new property, 8 elements must be taken into account: property_ids,
                  (i.e. the robot is close to an obstacle), the previous input linear velocity is over a certain threshold, the previous
                  angular input velocity is under a certain threshold.
     Computation of SpeedThreshold's output unsafe matrixes and biases:
-        safe: lb1 < y1 < ub1 - delta1 [delta1 is equal to eps1] AND (lb2 < y2 < delta2 OR delta2 < y2 < ub2) [delta2 is equal to eps2]
+        safe: lb1 < y1 < ub1 - delta1 [delta1 is equal to eps2] AND (lb2 < y2 < delta2 OR delta2 < y2 < ub2) [delta2 is equal to eps2]
 
         unsafe: ub1 - delta1 < y1 < ub1 AND -delta2 < y2 < delta2
         == (y1 < ub1 - delta1 OR -y1 < -lb1) AND (y2 < delta2 OR -y2 < delta2)
