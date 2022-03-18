@@ -94,7 +94,7 @@ class CompActor(torch.nn.Module):  # [2nd network] COMPatible ACTOR (actor net c
 
 if __name__ == "__main__":
 
-    pol_net_id = 'prev_2120_policy_net'  # Specify the network to convert
+    pol_net_id = 'thesis_main_policy_net'  # Specify the network to convert
 
     # Specify networks directory loading and saving paths
     netspath_load = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'results/nets_train/office_nav_sac'))

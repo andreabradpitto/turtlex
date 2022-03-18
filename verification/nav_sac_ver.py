@@ -15,7 +15,7 @@ from nav_sac_conv import PolicyNetwork, pnv_converter
 # Toggle whether to perform complete verification
 COMPLETE_VER = False  # default: True
 
-net_id = ['prev_2120_policy_net',]  # Names of the network to verify
+net_id = ['thesis_main_policy_net', 'thesis_2_policy_net']  # Names of the networks to verify
 
 property_ids = ["GlobalReach", "Local1", "GlobalPartial", "SpeedThreshold"]  # Definition of properties' names
 
