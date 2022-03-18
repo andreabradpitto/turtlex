@@ -61,8 +61,10 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
         self.consecutive_goals = 0
         self.consecutive_goal_threshold = 10
 
-        #self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.testing_goals)  # Uncomment to perform training with random goals
-        if not(self.is_training):
+        if(self.is_training):
+            if(self.random_train):
+                self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.testing_goals)  # Perform training with random goals
+        else:
             self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.testing_goals)
             self.solved_counter = 0
 
@@ -111,6 +113,8 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
         self.running_step = rospy.get_param("/turtlex_nav/running_step")
 
         self.test_areas = rospy.get_param("/turtlex_nav/test_areas")
+
+        self.random_train = rospy.get_param("/turtlex_nav/random_train")
 
     def gen_test_goals(self, goal_number):
         """
