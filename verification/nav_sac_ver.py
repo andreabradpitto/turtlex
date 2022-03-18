@@ -75,6 +75,7 @@ When adding a new property, 8 elements must be taken into account: property_ids,
 ver_params = [
               ["Over-Approx",   ["best_n_neurons", [0]],    None],
               ["Mixed",         ["best_n_neurons", [1]],    None],
+              ["Mixed2",        ["best_n_neurons", [2]],    None],
               ["Complete",      ["best_n_neurons", [100]],  None]
              ]
 
@@ -212,7 +213,7 @@ input_ub = [
 
             [laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[0] + eps[2][0], laser_bounds[1], laser_bounds[1],\
                 laser_bounds[1], laser_bounds[1], laser_bounds[1], heading_bounds[1], distance_bounds[1],\
-                    lin_vel_bounds[1], eps[3][1]]  # SpeedThreshold: all the sensors' lower bounds, except
+                    lin_vel_bounds[1], eps[3][1]]  # SpeedThreshold: all the sensors' upper bounds, except
                                                    # for the last 1: angular velocity
            ]
 
@@ -307,11 +308,11 @@ for net in range(len(net_id)): # Loop for each neural network
 
             # Stream and log the names of the currently active network, property, and parameter set
             logger_nav_stream.info(
-                f"Verifying nav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_empty.debug(f"\nnav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_lp.debug(f"\nnav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_lb.debug(f"\nnav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
-            #logger_ub.debug(f"\nnav_sac_net={agent.identifier}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+                f"Verifying nav_sac_net={net_id[net]}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_empty.debug(f"\nnav_sac_net={net_id[net]}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_lp.debug(f"\nnav_sac_net={net_id[net]}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_lb.debug(f"\nnav_sac_net={net_id[net]}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
+            #logger_ub.debug(f"\nnav_sac_net={net_id[net]}_PROP={property_ids[prop_idx]}_PARAMS={ver_params[verParam_idx][0]}\n")
 
             # Create the verifier
             verifier = ver.NeverVerification(ver_params[verParam_idx][1][0], ver_params[verParam_idx][1][1], ver_params[verParam_idx][2])
@@ -322,8 +323,8 @@ for net in range(len(net_id)): # Loop for each neural network
             verPar_time_end = time.perf_counter()
 
             # Log verification results in the verification log file
-            logger_nav_file.info(f"nav,{agent.identifier},{property_ids[prop_idx]},{ver_params[verParam_idx][0]}"
-                                f",{safe},{verPar_time_end - verPar_time_start}")
+            logger_nav_file.info(f"nav,{net_id[net]},{property_ids[prop_idx]},{ver_params[verParam_idx][0]}"
+                                 f",{safe},{verPar_time_end - verPar_time_start}")
 
 # Store and format the end time of the whole process
 end_time = datetime.now()
