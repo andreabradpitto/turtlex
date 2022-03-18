@@ -270,8 +270,8 @@ if __name__ == '__main__':
 
         m, s = divmod(int(time.time() - start_time), 60)
         h, m = divmod(m, 60)
-        rospy.loginfo(tcolors.MAGENTA + "| Episode: " + str(ep) + " | cumulated_ep_reward: " + str(cumulated_ep_reward) + " | highest_reward: " +
-                        str(highest_reward) + " | Final step: " + str(step) + " | Time: %d:%02d:%02d" % (h, m, s) + " |\n\n" + tcolors.ENDC)
+        rospy.loginfo(tcolors.MAGENTA + "Episode: " + str(ep) + " | cumulated_ep_reward: " + str(cumulated_ep_reward) + " | highest_reward: " +
+                        str(highest_reward) + " | Final step: " + str(step) + " | Time: %d:%02d:%02d" % (h, m, s) + "\n\n" + tcolors.ENDC)
 
         if is_training and ep % 20 == 0 and ep != episode_num:
             agent.save_weights(ep)
