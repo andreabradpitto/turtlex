@@ -17,7 +17,7 @@ COMPLETE_VER = False  # default: True
 
 net_id = ['thesis_main_policy_net', 'thesis_2_policy_net']  # Names of the networks to verify
 
-property_ids = ["GlobalReach", "Local1", "GlobalPartial", "SpeedThreshold"]  # Definition of properties' names
+property_ids = ["GlobalReach", "Local1", "Local2", "Local3", "GlobalPartial", "SpeedThreshold"]  # Definition of properties' names
 
 # Properties explanation
 """
@@ -39,22 +39,26 @@ When adding a new property, 8 elements must be taken into account: property_ids,
 
 -Local1: verify that for a local area around local_input (+/- eps), the output is always in an area around its local output (+/- delta)
 
+-Local2: verify that for a local area around local_input (+/- eps), the output is always in an area around its local output (+/- delta)
+
+-Local3: verify that for a local area around local_input (+/- eps), the output is always in an area around its local output (+/- delta)
+
 -GlobalPartial: verify that the network outputs a high angular velocity along with a low linear velocity, when input conditions are met.
                Those input conditions are: at least one of the front laser readings (e.g. the 5th out of 10) provides a low reading
                (i.e. the robot is close to an obstacle)
     Computation of GlobalPartial's output unsafe matrixes/biases (starting from safe area, i.e., low output lin. vel. + high out ang. vel.):
         safe: (lb1 < y1 < lb1 + delta1) AND ((lb2 < y2 < lb2 + delta2) OR (ub2 - delta2 < y2 < ub2))
-        ==   (lin_vel_bounds[0] < y1 < lin_vel_bounds[0] + delta[2][0]) AND
-                ((ang_vel_bounds[0] < y2 < ang_vel_bounds[0] + delta[2][1]) OR
-                (ang_vel_bounds[1] - delta[2][1] < y2 < ang_vel_bounds[1]))
+        ==   (lin_vel_bounds[0] < y1 < lin_vel_bounds[0] + delta[4][0]) AND
+                ((ang_vel_bounds[0] < y2 < ang_vel_bounds[0] + delta[4][1]) OR
+                (ang_vel_bounds[1] - delta[4][1] < y2 < ang_vel_bounds[1]))
 
-        unsafe:(lin_vel_bounds[0] + delta[2][0] < y1 < lin_vel_bounds[1]) AND
-                (ang_vel_bounds[0] + delta[2][1] < y2 < ang_vel_bounds[1] - delta[2][1])
-        ==   (y1 < lin_vel_bounds[1] OR -y1 < -lin_vel_bounds[0] - delta[2][0]) AND
-                (y2 < ang_vel_bounds[1] - delta[2][1] OR -y2 < -ang_vel_bounds[0] - delta[2][1])
+        unsafe:(lin_vel_bounds[0] + delta[4][0] < y1 < lin_vel_bounds[1]) AND
+                (ang_vel_bounds[0] + delta[4][1] < y2 < ang_vel_bounds[1] - delta[4][1])
+        ==   (y1 < lin_vel_bounds[1] OR -y1 < -lin_vel_bounds[0] - delta[4][0]) AND
+                (y2 < ang_vel_bounds[1] - delta[4][1] OR -y2 < -ang_vel_bounds[0] - delta[4][1])
         ==> the unsafe output matrices and vectors are:
             matrixes: [1, 0], [-1, 0], [0, 1], [0, -1]
-            vectors: [lin_vel_bounds[1]], [-lin_vel_bounds[0] - delta[2][0]], [ang_vel_bounds[1] - delta[2][1]], [-ang_vel_bounds[0] - delta[2][1]]
+            vectors: [lin_vel_bounds[1]], [-lin_vel_bounds[0] - delta[4][0]], [ang_vel_bounds[1] - delta[4][1]], [-ang_vel_bounds[0] - delta[4][1]]
 
 -SpeedThreshold: verify that the network decreases linear velocity and increases angular velocity, when input conditions are met.
                  Those input conditions are: at least one of the front laser readings (e.g. the 5th out of 10) provides a low reading
@@ -65,10 +69,10 @@ When adding a new property, 8 elements must be taken into account: property_ids,
 
         unsafe: ub1 - delta1 < y1 < ub1 AND -delta2 < y2 < delta2
         == (y1 < ub1 - delta1 OR -y1 < -lb1) AND (y2 < delta2 OR -y2 < delta2)
-        == (y1 < lin_vel_bounds[1] - delta[3][0] OR -y1 < -lin_vel_bounds[0]) AND (y2 < delta[3][1] OR -y2 < delta[3][1])
+        == (y1 < lin_vel_bounds[1] - delta[5][0] OR -y1 < -lin_vel_bounds[0]) AND (y2 < delta[5][1] OR -y2 < delta[5][1])
         ==> the unsafe output matrices and vectors are:
             matrices: [1, 0], [-1, 0], [0, 1], [0, -1]
-            vectors: [lin_vel_bounds[1] - delta[3][0]], [lin_vel_bounds[0]], [delta[3][1]], [delta[3][1]]
+            vectors: [lin_vel_bounds[1] - delta[5][0]], [lin_vel_bounds[0]], [delta[5][1]], [delta[5][1]]
 """
 
 # Verification parameters: parameter set ID, heuristic, params, refinement level
@@ -76,6 +80,7 @@ ver_params = [
               ["Over-Approx",   ["best_n_neurons", [0]],    None],
               ["Mixed",         ["best_n_neurons", [1]],    None],
               ["Mixed2",        ["best_n_neurons", [2]],    None],
+              ["Mixed4",        ["best_n_neurons", [4]],    None],
               ["Complete",      ["best_n_neurons", [100]],  None]
              ]
 
@@ -155,6 +160,8 @@ action_dim = 2  # output layer dimension
 eps = [
        [],  # GlobalReach: a global property does not feature input tolerances
        [0.1, 0.2, 0.1, 0.05, 0.2],  # Local1: input tolerance for lasers (x10), goal heading, goal distance, linear velocity, angular velocity
+       [0.1, 0.2, 0.1, 0.05, 0.2],  # Local2: input tolerance for lasers (x10), goal heading, goal distance, linear velocity, angular velocity
+       [0.1, 0.2, 0.1, 0.05, 0.2],  # Local3: input tolerance for lasers (x10), goal heading, goal distance, linear velocity, angular velocity
        [0.05],  # GlobalPartial: input tolerance just for a single laser scan
        [0.05, 0.02, 0.2]  # SpeedThreshold: input tolerance for a single laser scan, linear and angular input velocities
       ]
@@ -163,6 +170,8 @@ eps = [
 delta = [
          [],  # GlobalReach: a global property does not feature output tolerances
          [0.05, 0.2],  # Local1: output tolerance for linear velocity, angular velocity
+         [0.05, 0.2],  # Local2: output tolerance for linear velocity, angular velocity
+         [0.05, 0.2],  # Local3: output tolerance for linear velocity, angular velocity
          [0.11, 1],  # GlobalPartial: output tolerance for linear velocity, angular velocity
          [0.02, 0.2]  # SpeedThreshold: output tolerance for linear velocity, angular velocity
         ]
@@ -171,6 +180,8 @@ delta = [
 local_input = [
                [],  # GlobalReach: a global property does not feature local inputs (and outputs)
                [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.0, 0.1, 0.21, 0.0],  # Local1: local value for all the inputs
+               [3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 0.1, 4.0, 0.12, 0.5],  # Local2: local value for all the inputs
+               [4.2, 4.2, 4.2, 4.2, 4.2, 0.25, 0.25, 0.25, 4.2, 4.2, 3.0, 7.1, 0.1, -2.0],  # Local3: local value for all the inputs
                [],  # GlobalPartial: this property does not feature local inputs (and outputs)
                []  # SpeedThreshold: this property does not feature local inputs (and outputs)
               ]
@@ -187,13 +198,25 @@ input_lb = [
                 local_input[1][10] - eps[1][1], local_input[1][11] - eps[1][2], local_input[1][12] - eps[1][3],\
                 local_input[1][13] - eps[1][4]],  # Local1: all the sensors' local input values minus the local tolerance
 
+            [local_input[2][0] - eps[2][0], local_input[2][1] - eps[2][0], local_input[2][2] - eps[2][0], local_input[2][3] - eps[2][0],\
+                local_input[2][4] - eps[2][0], local_input[2][5] - eps[2][0], local_input[2][6] - eps[2][0],\
+                local_input[2][7] - eps[2][0], local_input[2][8] - eps[2][0], local_input[2][9] - eps[2][0],\
+                local_input[2][10] - eps[2][1], local_input[2][11] - eps[2][2], local_input[2][12] - eps[2][3],\
+                local_input[2][13] - eps[2][4]],  # Local2: all the sensors' local input values minus the local tolerance
+
+            [local_input[3][0] - eps[3][0], local_input[3][1] - eps[3][0], local_input[3][2] - eps[3][0], local_input[3][3] - eps[3][0],\
+                local_input[3][4] - eps[3][0], local_input[3][5] - eps[3][0], local_input[3][6] - eps[3][0],\
+                local_input[3][7] - eps[3][0], local_input[3][8] - eps[3][0], local_input[3][9] - eps[3][0],\
+                local_input[3][10] - eps[3][1], local_input[3][11] - eps[3][2], local_input[3][12] - eps[3][3],\
+                local_input[3][13] - eps[3][4]],  # Local3: all the sensors' local input values minus the local tolerance
+
             [laser_bounds[0], laser_bounds[0], laser_bounds[0], laser_bounds[0], laser_bounds[0], laser_bounds[0], laser_bounds[0],\
                 laser_bounds[0], laser_bounds[0], laser_bounds[0], heading_bounds[0], distance_bounds[0],\
                     lin_vel_bounds[0], ang_vel_bounds[0]],  # GlobalPartial: all the sensors' lower bounds
 
             [laser_bounds[0], laser_bounds[0], laser_bounds[0], laser_bounds[0], laser_bounds[0], laser_bounds[0], laser_bounds[0],\
                 laser_bounds[0], laser_bounds[0], laser_bounds[0], heading_bounds[0], distance_bounds[0],\
-                    lin_vel_bounds[1] - eps[3][1], -eps[3][2]]  # SpeedThreshold: all the sensors' lower bounds, except
+                    lin_vel_bounds[1] - eps[5][1], -eps[5][2]]  # SpeedThreshold: all the sensors' lower bounds, except
                                                                 # for the last 2: linear and angular velocities
            ]
 input_ub = [
@@ -207,13 +230,25 @@ input_ub = [
                 local_input[1][10] + eps[1][1], local_input[1][11] + eps[1][2], local_input[1][12] + eps[1][3],\
                 local_input[1][13] + eps[1][4]],  # Local1: all the sensors' local input values plus the local tolerance
 
-            [laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[0] + eps[2][0], laser_bounds[1], laser_bounds[1],\
+            [local_input[2][0] + eps[2][0], local_input[2][1] + eps[2][0], local_input[2][2] + eps[2][0], local_input[2][3] + eps[2][0],\
+                local_input[2][4] + eps[2][0], local_input[2][5] + eps[2][0], local_input[2][6] + eps[2][0],\
+                local_input[2][7] + eps[2][0], local_input[2][8] + eps[2][0], local_input[2][9] + eps[2][0],\
+                local_input[2][10] + eps[2][1], local_input[2][11] + eps[2][2], local_input[2][12] + eps[2][3],\
+                local_input[2][13] + eps[2][4]],  # Local2: all the sensors' local input values plus the local tolerance
+
+            [local_input[3][0] + eps[3][0], local_input[3][1] + eps[3][0], local_input[3][2] + eps[3][0], local_input[3][3] + eps[3][0],\
+                local_input[3][4] + eps[3][0], local_input[3][5] + eps[3][0], local_input[3][6] + eps[3][0],\
+                local_input[3][7] + eps[3][0], local_input[3][8] + eps[3][0], local_input[3][9] + eps[3][0],\
+                local_input[3][10] + eps[3][1], local_input[3][11] + eps[3][2], local_input[3][12] + eps[3][3],\
+                local_input[3][13] + eps[3][4]],  # Local3: all the sensors' local input values plus the local tolerance
+
+            [laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[0] + eps[4][0], laser_bounds[1], laser_bounds[1],\
                 laser_bounds[1], laser_bounds[1], laser_bounds[1], heading_bounds[1], distance_bounds[1],\
                     lin_vel_bounds[1], ang_vel_bounds[1]],  # GlobalPartial: all the sensors' upper bounds, except for the 5th laser scan
 
-            [laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[0] + eps[3][0], laser_bounds[1], laser_bounds[1],\
+            [laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[1], laser_bounds[0] + eps[5][0], laser_bounds[1], laser_bounds[1],\
                 laser_bounds[1], laser_bounds[1], laser_bounds[1], heading_bounds[1], distance_bounds[1],\
-                    lin_vel_bounds[1], eps[3][2]]  # SpeedThreshold: all the sensors' upper bounds, except
+                    lin_vel_bounds[1], eps[5][2]]  # SpeedThreshold: all the sensors' upper bounds, except
                                                    # for the last 1: angular velocity
            ]
 
@@ -255,17 +290,28 @@ for net in range(len(net_id)): # Loop for each neural network
     unsafe_mats = [
                     [[1, 0], [-1, 0], [0, 1], [0, -1]],  # GlobalReach: 2 conditions for each output
                     [[1, 0], [-1, 0], [0, 1], [0, -1]],  # Local1: 2 conditions for each output
+                    [[1, 0], [-1, 0], [0, 1], [0, -1]],  # Local2: 2 conditions for each output
+                    [[1, 0], [-1, 0], [0, 1], [0, -1]],  # Local3: 2 conditions for each output
                     [[1, 0], [-1, 0], [0, 1], [0, -1]],  # GlobalPartial: 2 conditions for each output
                     [[1, 0], [-1, 0], [0, 1], [0, -1]]  # SpeedThreshold: 2 conditions for each output
                 ]
     unsafe_vecs = [
                     [[lin_vel_bounds[0]], [-lin_vel_bounds[1]], [ang_vel_bounds[0]], [-ang_vel_bounds[1]]],  # GlobalReach: outputs' lower and upper bounds
+
                     [[local_output[1][0] - delta[1][0]], [-local_output[1][0] - delta[1][0]],\
                         [local_output[1][1] - delta[1][1]], [-local_output[1][1] - delta[1][1]]],  #Local1: all the outputs' local lower and upper bounds
-                    [[lin_vel_bounds[1]], [-lin_vel_bounds[0] - delta[2][0]],\
-                        [ang_vel_bounds[1] - delta[2][1]], [-ang_vel_bounds[0] - delta[2][1]]],  #GlobalPartial: linear velocity is higher than chosen threshold,
+
+                    [[local_output[2][0] - delta[2][0]], [-local_output[2][0] - delta[2][0]],\
+                        [local_output[2][1] - delta[2][1]], [-local_output[2][1] - delta[2][1]]],  #Local2: all the outputs' local lower and upper bounds
+
+                    [[local_output[3][0] - delta[3][0]], [-local_output[3][0] - delta[3][0]],\
+                        [local_output[3][1] - delta[3][1]], [-local_output[3][1] - delta[3][1]]],  #Local3: all the outputs' local lower and upper bounds
+
+                    [[lin_vel_bounds[1]], [-lin_vel_bounds[0] - delta[4][0]],\
+                        [ang_vel_bounds[1] - delta[4][1]], [-ang_vel_bounds[0] - delta[4][1]]],  #GlobalPartial: linear velocity is higher than chosen threshold,
                                                                                                 # (absolute) angular velocity is lower than chosen threshold
-                    [[lin_vel_bounds[1] - delta[3][0]], [lin_vel_bounds[0]], [delta[3][1]], [delta[3][1]]]  # SpeedThreshold: linear velocity is higher than chosen threshold,
+
+                    [[lin_vel_bounds[1] - delta[5][0]], [lin_vel_bounds[0]], [delta[5][1]], [delta[5][1]]]  # SpeedThreshold: linear velocity is higher than chosen threshold,
                                                                                                             # (absolute) angular velocity is lower than chosen threshold
                 ]
 
