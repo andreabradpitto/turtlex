@@ -11,9 +11,9 @@ turtlex_nav: # namespace
     replay_buffer_size: 50000
 
     training: True  # True for training, False for testing
-    test_areas: 8  # A number between 1 and 8 for the office world
-    random_train: False  # perform training with random goals
+    random_train: False  # perform training with random goals, intead of the predetermined ones (see desired_pose)
     random_goals: 100  # amount of random goals to attempt. This is always relevant when testing, and also when training if random_train == True
+    test_areas: 8  # A number between 1 and 8 for the office world
 
     load_model: False  # set the NUMBER or 'NAME' of the network to load, set False to skip loading (i.e. train from scratch)
 

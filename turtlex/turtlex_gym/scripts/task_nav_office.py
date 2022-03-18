@@ -63,9 +63,9 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
 
         if(self.is_training):
             if(self.random_train):
-                self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.testing_goals)  # Perform training with random goals
+                self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.random_goals)  # Perform training with random goals
         else:
-            self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.testing_goals)
+            self.goal_x_list, self.goal_y_list = self.gen_test_goals(self.random_goals)
             self.solved_counter = 0
 
         rospy.loginfo("Action space types ===> " + str(self.action_space))
@@ -77,7 +77,8 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
         """
 
         self.is_training = rospy.get_param("/turtlex_nav/training")
-        self.testing_goals = rospy.get_param("/turtlex_nav/testing_goals")
+        self.random_train = rospy.get_param("/turtlex_nav/random_train")
+        self.random_goals = rospy.get_param("/turtlex_nav/random_goals")
 
         self.action_v_min = rospy.get_param("/turtlex_nav/action_v_min")
         self.action_w_min = rospy.get_param("/turtlex_nav/action_w_min")
@@ -113,8 +114,6 @@ class TaskNavOfficeEnv(turtlex_env.TurtlexEnv):
         self.running_step = rospy.get_param("/turtlex_nav/running_step")
 
         self.test_areas = rospy.get_param("/turtlex_nav/test_areas")
-
-        self.random_train = rospy.get_param("/turtlex_nav/random_train")
 
     def gen_test_goals(self, goal_number):
         """
