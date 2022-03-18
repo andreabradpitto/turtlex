@@ -127,7 +127,7 @@ logger_nav_stream.addHandler(nav_stream_handler)
 #formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 #nav_stream_handler.setFormatter(formatter)
 
-logger_nav_file.info(f"Net_ID,Property,Param_set,Safe,Time_elapsed\n")  # Write legend for the log file as its first row
+logger_nav_file.info(f"Net_ID,Property,Param_set,Safe,Time_elapsed")  # Write the legend for the log file as its first row
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Use CUDA, if available
 
@@ -325,6 +325,8 @@ for net in range(len(net_id)): # Loop for each neural network
             # Log verification results in the verification log file
             logger_nav_file.info(f"nav,{net_id[net]},{property_ids[prop_idx]},{ver_params[verParam_idx][0]}"
                                  f",{safe},{verPar_time_end - verPar_time_start}")
+
+logger_nav_file.info("\n")  # Add an empty line at the end of the verification log file
 
 # Store and format the end time of the whole process
 end_time = datetime.now()
