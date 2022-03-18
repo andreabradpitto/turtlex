@@ -249,6 +249,7 @@ if __name__ == '__main__':
     rospy.loginfo("Gym environment created")
 
     is_training = env.is_training
+    random_train = env.random_train
 
     batch_size  = rospy.get_param("/turtlex_nav/batch_size")
 
@@ -313,8 +314,8 @@ if __name__ == '__main__':
 
     highest_reward = 0
 
-    if not is_training:
-        max_episodes = env.testing_goals
+    if not is_training or is_training and random_train:
+        max_episodes = env.random_goals
 
     start_time = time.time()
 
