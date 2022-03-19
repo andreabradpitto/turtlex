@@ -1,5 +1,7 @@
 # [Turtlex](https://github.com/andreabradpitto/turtlex)
 
+**This readme is currently incomplete.**
+
 ## 📛 Introduction
 
 This is my repository for my Master Thesis project "Safe Learning for Robotics: Abstraction Techniques for Efficient Verification" for the [Robotics Engineering](https://courses.unige.it/10635) master's degree course study (2019-2021), attended at the [University of Genoa](https://unige.it/en).
@@ -25,6 +27,7 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 - [OpenaAI Gym](https://gym.openai.com/docs/)
 - [PyTorch](https://pytorch.org/get-started/locally/)
 - [TensorFlow](https://www.tensorflow.org/install/)
+- [MoveIt](https://moveit.ros.org/install/)
 - [OpenCV](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)
 - [MPI for Python](https://mpi4py.readthedocs.io/en/stable/install.html) (`python -m pip install mpi4py`)
 - [pyassimp](https://pypi.org/project/pyassimp/) (`python -m pip install pyassimp`) due to [this](https://github.com/ros-planning/moveit/issues/86) issue
