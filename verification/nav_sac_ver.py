@@ -18,7 +18,7 @@ COMPLETE_VER = False  # default: True
 # Toggle whether to skip remaining property parameters if a more approximating one returns verifies the property
 SAFE_PARAM_SKIP = False  # default: False
 
-net_id = ['thesis_main_policy_net', 'thesis_2_policy_net']  # Names of the networks to verify
+net_id = ['thesis_main_policy_net',]  # Names of the networks to verify
 
 property_ids = ["GlobalReach", "Local1", "Local2", "Local3", "GlobalPartial", "SpeedThreshold"]  # Definition of properties' names
 
@@ -82,8 +82,6 @@ When adding a new property, 8 elements must be taken into account: property_ids,
 ver_params = [
               ["Over-Approx",   ["best_n_neurons", [0]],    None],
               ["Mixed",         ["best_n_neurons", [1]],    None],
-              ["Mixed2",        ["best_n_neurons", [2]],    None],
-              ["Mixed4",        ["best_n_neurons", [4]],    None],
               ["Complete",      ["best_n_neurons", [100]],  None]
              ]
 
