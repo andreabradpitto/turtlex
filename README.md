@@ -23,7 +23,7 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 ## ❗ Software requirements
 
 - [ROS Noetic](http://wiki.ros.org/noetic/Installation) (full installation recommended)
-- [openai_ros](https://bitbucket.org/theconstructcore/openai_ros/src/kinetic-devel/); you may need to change the `package.xml` file's line 14 from `<build_depend>python-catkin-pkg</build_depend>` to `<build_depend>python3-catkin-pkg</build_depend>`
+- [openai_ros](https://bitbucket.org/theconstructcore/openai_ros/src/kinetic-devel/); you may need to change the `package.xml` file's line 14 from `<build_depend>python-catkin-pkg</build_depend>` to `<build_depend>python3-catkin-pkg</build_depend>`. Furthermore, change the shebang of `controllers_connection.py` and `gazebo_connection.py` to `#!/usr/bin/env python3`
 - [OpenaAI Gym](https://gym.openai.com/docs/)
 - [PyTorch](https://pytorch.org/get-started/locally/)
 - [TensorFlow](https://www.tensorflow.org/install/)
