@@ -23,7 +23,7 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 ## ❗ Software requirements
 
 - [ROS Noetic](http://wiki.ros.org/noetic/Installation) (full installation recommended)
-- [openai_ros](https://bitbucket.org/theconstructcore/openai_ros/src/kinetic-devel/)
+- [openai_ros](https://bitbucket.org/theconstructcore/openai_ros/src/kinetic-devel/)*
 - [OpenaAI Gym](https://gym.openai.com/docs/)
 - [PyTorch](https://pytorch.org/get-started/locally/)
 - [TensorFlow](https://www.tensorflow.org/install/)
@@ -31,6 +31,8 @@ This is my repository for my Master Thesis project "Safe Learning for Robotics: 
 - [OpenCV](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)
 - [MPI for Python](https://mpi4py.readthedocs.io/en/stable/install.html) (`python -m pip install mpi4py`)
 - [pyassimp](https://pypi.org/project/pyassimp/) (`python -m pip install pyassimp`) due to [this](https://github.com/ros-planning/moveit/issues/86) issue
+
+* you may need to change the `package.xml` file line `14` from `<build_depend>python-catkin-pkg</build_depend>` to `<build_depend>python3-catkin-pkg</build_depend>`
 
 ## ✅ Installation
 
